@@ -1,15 +1,13 @@
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-// import TwoDBoards from "../components/TwoDBoards";
 
-const deg = 1.57079633;
 const createScene = async () => {
-  const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+  const canvas = document.getElementById("BoardsCanvas"); // Get the canvas element
   const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
   // eslint-disable-next-line no-unused-vars
   const scene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera(
-    "cam",
+    "cam1",
     3.92699082,
     0.78539816,
     20,
@@ -30,15 +28,10 @@ const createScene = async () => {
   camera.orthoRight = -5;
   camera.orthoBottom = -5;
   const light = new BABYLON.HemisphericLight(
-    "light",
+    "light1",
     new BABYLON.Vector3(500, 500, 500)
   );
   light.intensity = 0.3;
-  const light2 = new BABYLON.HemisphericLight(
-    "light",
-    new BABYLON.Vector3(-5, -500, -500)
-  );
-  light2.intensity = 0.3;
   // eslint-disable-next-line no-unused-vars
   const ThreeDBoard = Array(5);
   for (let index = 0; index < ThreeDBoard.length; index += 1) {
@@ -60,7 +53,7 @@ const createScene = async () => {
   for (let i = 0; i < 5; i += 1)
     for (let j = 0; j < 5; j += 1)
       for (let k = 0; k < 5; k += 1) {
-        ThreeDBoard[i][j][k] = BABYLON.MeshBuilder.CreatePlane("box1", {
+        ThreeDBoard[i][j][k] = BABYLON.MeshBuilder.CreatePlane("box11", {
           size: 1,
           sideOrientation: BABYLON.Mesh.DOUBLESIDE,
           frontUVs: f,
@@ -75,20 +68,9 @@ const createScene = async () => {
       }
 
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-  const pawn = BABYLON.SceneLoader.ImportMeshAsync(
-    "",
-    "/obj/",
-    "ChessPawn.obj",
-    scene
-  );
-  (await pawn).meshes[0].position = new BABYLON.Vector3(0, 1, 1.53);
-  (await pawn).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
-  (await pawn).meshes[0].scaling = new BABYLON.Vector3(0.0025, 0.0025, 0.0025);
-  (await pawn).meshes[0].material = mat;
   camera.setTarget(ThreeDBoard[3][3][3]);
   return scene;
 };
-
 const animateScene = async () => {
   const newScene = await createScene();
   const engine = newScene.getEngine();
@@ -99,15 +81,14 @@ const animateScene = async () => {
     engine.resize();
   });
 };
-
-const MainScreen = {
+const TwoDBoards = {
   after_render: async () => {
     await animateScene();
   },
   render: () => {
     return `<div>
-    <canvas id="renderCanvas" touch-action="none"></canvas>
-    </div>`;
+      <canvas id="BoardsCanvas" touch-action="none"></canvas>
+      </div>`;
   },
 };
-export default MainScreen;
+export default TwoDBoards;

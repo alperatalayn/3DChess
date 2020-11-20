@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "babylonjs": "^4.2.0"
+    "babylonjs": "^4.2.0",
+    "babylonjs-loaders": "^4.2.0"
   }
 }
