@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+body {
+  height: 100vh;
+  font: 1.6rem Helvetica, Arial;
+  margin: 0;
+}
+
+a {
+  font-weight: bold;
+  color: #000000;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #008000;
+}
+button {
+  cursor: pointer;
+}
+input,
+button {
+  font: 1.6rem helvetica;
+  padding: 1rem;
+  border: 0.1rem #808080 solid;
+  border-radius: 0.5rem;
+}
+input:hover,
+button:hover {
+  border: 0.1rem #404040 solid;
+}
+button.primary {
+  background-color: #f0c040;
+}
+.overlay {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(16, 16, 16, 0.7);
+}
+.overlay.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+}
+.overlay > div {
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 40rem;
+}
+.overlay > div > * {
+  margin: 2rem;
+}
+.fw {
+  width: 100%;
+}
+.success {
+  color: #40f040;
+}
+.error {
+  color: #c04040;
+}
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-columns: 1fr;
+  grid-template-rows: 5rem 1fr 5rem;
+  height: 100%;
+}
+header {
+  grid-area: header;
+  background-color: #203040;
+  color: #be6969;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+}
+header a {
+  color: #ffffff;
+  text-decoration: none;
+  padding-right: 0.5rem;
+}
+
+header a:hover {
+  color: #008000;
+}
+
+.brand a {
+  font-size: 3rem;
+  font-weight: bold;
+  padding-left: 1rem;
+}
+
+footer {
+  background-color: #203040;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+}
+
+/*Form*/
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.form-items {
+  display: flex;
+  flex-direction: column;
+  width: 32rem;
+  padding: 2rem;
+  border: 0.1rem #c0c0c0 solid;
+  border-radius: 0.5rem;
+  list-style-type: none;
+}
+.form-items li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+.form-container h1 {
+  font-size: 2.5rem;
+}
+/*profile*/
+.profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.profile-info {
+  flex: 1 1 30rem;
+}
+#renderCanvas {
+  width: 800px;
+  height: 800px;
+  justify-content: center;
+  margin: auto;
+}
+#renderCanvas.active {
+  border: none;
+}
