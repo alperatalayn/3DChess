@@ -1,6 +1,5 @@
 # Blender v2.90.1 OBJ File: ''
 # www.blender.org
-mtllib ChessKnight.mtl
 o WhiteKnight_Cylinder.003
 v -0.065707 0.029507 0.211113
 v -0.020378 0.029507 0.220161

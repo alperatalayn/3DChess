@@ -1,6 +1,5 @@
 # Blender v2.90.1 OBJ File: ''
 # www.blender.org
-mtllib ChessRook.mtl
 o WhiteRook_Cylinder
 v 0.000000 0.028999 -0.221102
 v 0.000000 0.031210 -0.221102

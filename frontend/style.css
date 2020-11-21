@@ -155,8 +155,8 @@ footer {
 }
 #renderCanvas {
   outline: none;
-  width: 850px;
-  height: 845px;
+  width: 831px;
+  height: 831px;
 }
 #renderCanvas.active {
   border: none;
