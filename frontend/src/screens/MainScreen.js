@@ -78,9 +78,9 @@ const createScene = async () => {
   const scene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera(
     "cam",
-    3.92699082,
-    0.78539816,
-    20,
+    0,
+    (deg * 3) / 2,
+    15,
     new BABYLON.Vector3(0, 0, 0),
     scene,
     true
@@ -89,24 +89,20 @@ const createScene = async () => {
 
   // This attaches the camera to the canvas
   camera.attachControl(canvas, true);
-  camera.attachControl(canvas, true);
-  camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-  camera.maxZ = 100000;
-  camera.minZ = -100000;
-  camera.orthoLeft = 5;
-  camera.orthoTop = 5;
-  camera.orthoRight = -5;
-  camera.orthoBottom = -5;
+  camera.mode = BABYLON.Camera.PERSPECTIVE_CAMERA;
+  camera.lowerAlphaLimit = (deg * 2) / 3;
+  camera.upperAlphaLimit = (deg * 4) / 3;
+
+  camera.lowerBetaLimit = deg;
+  camera.upperBetaLimit = deg * 2;
+
+  camera.lowerRadiusLimit = 12.5;
+  camera.upperRadiusLimit = 22.5;
   const light = new BABYLON.HemisphericLight(
     "light",
-    new BABYLON.Vector3(500, 500, 500)
+    new BABYLON.Vector3(3, 3, 5)
   );
-  light.intensity = 0.3;
-  const light2 = new BABYLON.HemisphericLight(
-    "light",
-    new BABYLON.Vector3(-5, -500, -500)
-  );
-  light2.intensity = 0.3;
+  light.intensity = 0.6;
   // eslint-disable-next-line no-unused-vars
   const ThreeDBoard = Array(5);
   for (let index = 0; index < ThreeDBoard.length; index += 1) {
@@ -128,13 +124,14 @@ const createScene = async () => {
   for (let i = 0; i < 5; i += 1)
     for (let j = 0; j < 5; j += 1)
       for (let k = 0; k < 5; k += 1) {
-        ThreeDBoard[i][j][k] = BABYLON.MeshBuilder.CreatePlane("box1", {
+        ThreeDBoard[i][j][k] = BABYLON.MeshBuilder.CreateBox("box1", {
           size: 1,
+          depth: 0.1,
           sideOrientation: BABYLON.Mesh.DOUBLESIDE,
           frontUVs: f,
           backUVs: b,
         });
-        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 1.5);
+        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 2.15);
         if ((j + k + i) % 2 === 1) {
           ThreeDBoard[i][j][k].material = mat1;
         } else {
@@ -153,7 +150,7 @@ const createScene = async () => {
     (await p).meshes[0].position = new BABYLON.Vector3(
       GameState[piece].coordinates[0],
       GameState[piece].coordinates[1],
-      GameState[piece].coordinates[2] * 1.53
+      GameState[piece].coordinates[2] * 2.15 + 0.09
     );
     (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
     if (GameState[piece].color === "White") (await p).meshes[0].material = mat;
@@ -161,7 +158,7 @@ const createScene = async () => {
       (await p).meshes[0].material = mat1;
   }
 
-  camera.setTarget(ThreeDBoard[3][3][3]);
+  camera.setTarget(ThreeDBoard[2][2][2]);
   return scene;
 };
 

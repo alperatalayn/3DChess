@@ -154,10 +154,9 @@ footer {
   flex: 1 1 30rem;
 }
 #renderCanvas {
-  width: 800px;
-  height: 800px;
-  justify-content: center;
-  margin: auto;
+  outline: none;
+  width: 850px;
+  height: 845px;
 }
 #renderCanvas.active {
   border: none;
