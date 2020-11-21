@@ -1,6 +1,74 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 // import TwoDBoards from "../components/TwoDBoards";
+
+function Piece(type, coordinates, obj, color) {
+  this.obj = obj;
+  this.coordinates = coordinates;
+  this.type = type;
+  this.color = color;
+}
+
+let GameState = Piece[40];
+GameState = {
+  p1: new Piece("WhitePawn", [0, 1, 0], "ChessPawn.obj", "White"),
+  p2: new Piece("WhitePawn", [1, 1, 0], "ChessPawn.obj", "White"),
+  p3: new Piece("WhitePawn", [2, 1, 0], "ChessPawn.obj", "White"),
+  p4: new Piece("WhitePawn", [3, 1, 0], "ChessPawn.obj", "White"),
+  p5: new Piece("WhitePawn", [4, 1, 0], "ChessPawn.obj", "White"),
+  p6: new Piece("WhitePawn", [0, 1, 1], "ChessPawn.obj", "White"),
+  p7: new Piece("WhitePawn", [1, 1, 1], "ChessPawn.obj", "White"),
+  p8: new Piece("WhitePawn", [2, 1, 1], "ChessPawn.obj", "White"),
+  p9: new Piece("WhitePawn", [3, 1, 1], "ChessPawn.obj", "White"),
+  p10: new Piece("WhitePawn", [4, 1, 1], "ChessPawn.obj", "White"),
+  p11: new Piece("Rook", [0, 0, 0], "ChessRook.obj", "White"),
+  p12: new Piece("Knight", [1, 0, 0], "ChessKnight.obj", "White"),
+  p13: new Piece("King", [2, 0, 0], "ChessKing.obj", "White"),
+  p14: new Piece("Knight", [3, 0, 0], "ChessKnight.obj", "White"),
+  p15: new Piece("Rook", [4, 0, 0], "ChessRook.obj", "White"),
+  p16: new Piece("Bishop", [0, 0, 1], "ChessBishop.obj", "White"),
+  p17: new Piece("Unicorn", [1, 0, 1], "ChessUnicornWhite.obj", "White"),
+  p18: new Piece("Queen", [2, 0, 1], "ChessQueen.obj", "White"),
+  p19: new Piece("Bishop", [3, 0, 1], "ChessBishop.obj", "White"),
+  p20: new Piece("Unicorn", [4, 0, 1], "ChessUnicornWhite.obj", "White"),
+
+  p21: new Piece("WhitePawn", [0, 3, 4], "ChessPawn.obj", "Black"),
+  p22: new Piece("WhitePawn", [1, 3, 4], "ChessPawn.obj", "Black"),
+  p23: new Piece("WhitePawn", [2, 3, 4], "ChessPawn.obj", "Black"),
+  p24: new Piece("WhitePawn", [3, 3, 4], "ChessPawn.obj", "Black"),
+  p25: new Piece("WhitePawn", [4, 3, 4], "ChessPawn.obj", "Black"),
+  p26: new Piece("WhitePawn", [0, 3, 3], "ChessPawn.obj", "Black"),
+  p27: new Piece("WhitePawn", [1, 3, 3], "ChessPawn.obj", "Black"),
+  p28: new Piece("WhitePawn", [2, 3, 3], "ChessPawn.obj", "Black"),
+  p29: new Piece("WhitePawn", [3, 3, 3], "ChessPawn.obj", "Black"),
+  p30: new Piece("WhitePawn", [4, 3, 3], "ChessPawn.obj", "Black"),
+  p31: new Piece("Rook", [0, 4, 4], "ChessRook.obj", "Black"),
+  p32: new Piece("Knight", [1, 4, 4], "ChessKnight.obj", "Black"),
+  p33: new Piece("King", [2, 4, 4], "ChessKing.obj", "Black"),
+  p34: new Piece("Knight", [3, 4, 4], "ChessKnight.obj", "Black"),
+  p35: new Piece("Rook", [4, 4, 4], "ChessRook.obj", "Black"),
+  p36: new Piece("Bishop", [1, 4, 3], "ChessBishop.obj", "Black"),
+  p37: new Piece("Unicorn", [0, 4, 3], "ChessUnicornWhite.obj", "Black"),
+  p38: new Piece("Queen", [2, 4, 3], "ChessQueen.obj", "Black"),
+  p39: new Piece("Bishop", [4, 4, 3], "ChessBishop.obj", "Black"),
+  p40: new Piece("Unicorn", [3, 4, 3], "ChessUnicornWhite.obj", "Black"),
+};
+
+// function move(Piece, GameState, x, y, z) {
+//   if (Piece.type === "WhitePawn") {
+//     P;
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   } else if (Piece.type === "WhitePawn") {
+//   }
+// }
 
 const deg = 1.57079633;
 const createScene = async () => {
@@ -74,17 +142,25 @@ const createScene = async () => {
         }
       }
 
-  scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-  const pawn = BABYLON.SceneLoader.ImportMeshAsync(
-    "",
-    "/obj/",
-    "ChessPawn.obj",
-    scene
-  );
-  (await pawn).meshes[0].position = new BABYLON.Vector3(0, 1, 1.53);
-  (await pawn).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
-  (await pawn).meshes[0].scaling = new BABYLON.Vector3(0.0025, 0.0025, 0.0025);
-  (await pawn).meshes[0].material = mat;
+  for (const piece in GameState) {
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+    const p = BABYLON.SceneLoader.ImportMeshAsync(
+      null,
+      "/obj/",
+      GameState[piece].obj,
+      scene
+    );
+    (await p).meshes[0].position = new BABYLON.Vector3(
+      GameState[piece].coordinates[0],
+      GameState[piece].coordinates[1],
+      GameState[piece].coordinates[2] * 1.53
+    );
+    (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
+    if (GameState[piece].color === "White") (await p).meshes[0].material = mat;
+    else if (GameState[piece].color === "Black")
+      (await p).meshes[0].material = mat1;
+  }
+
   camera.setTarget(ThreeDBoard[3][3][3]);
   return scene;
 };
