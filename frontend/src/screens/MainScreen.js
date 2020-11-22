@@ -4,6 +4,7 @@
 /* eslint-disable no-restricted-syntax */
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
+import { allMoves } from "../moves";
 // import TwoDBoards from "../components/TwoDBoards";
 
 class Piece {
@@ -27,57 +28,37 @@ GameState = {
   p8: new Piece("WhitePawn", { x: 2, y: 1, z: 1 }, "ChessPawn.obj", "White"),
   p9: new Piece("WhitePawn", { x: 3, y: 1, z: 1 }, "ChessPawn.obj", "White"),
   p10: new Piece("WhitePawn", { x: 4, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p11: new Piece("Rook", { x: 0, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  p12: new Piece("Knight", { x: 1, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  p13: new Piece("King", { x: 2, y: 0, z: 0 }, "ChessKing.obj", "White"),
-  p14: new Piece("Knight", { x: 3, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  p15: new Piece("Rook", { x: 4, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  p16: new Piece("Bishop", { x: 0, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  p17: new Piece(
-    "Unicorn",
-    { x: 1, y: 0, z: 1 },
-    "ChessUnicornWhite.obj",
-    "White"
-  ),
-  p18: new Piece("Queen", { x: 2, y: 0, z: 1 }, "ChessQueen.obj", "White"),
-  p19: new Piece("Bishop", { x: 3, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  p20: new Piece(
-    "Unicorn",
-    { x: 4, y: 0, z: 1 },
-    "ChessUnicornWhite.obj",
-    "White"
-  ),
+  wr1: new Piece("Rook", { x: 0, y: 0, z: 0 }, "ChessRook.obj", "White"),
+  wn1: new Piece("Knight", { x: 1, y: 0, z: 0 }, "ChessKnight.obj", "White"),
+  wk: new Piece("King", { x: 2, y: 0, z: 0 }, "ChessKing.obj", "White"),
+  wn2: new Piece("Knight", { x: 3, y: 0, z: 0 }, "ChessKnight.obj", "White"),
+  wr2: new Piece("Rook", { x: 4, y: 0, z: 0 }, "ChessRook.obj", "White"),
+  wb1: new Piece("Bishop", { x: 0, y: 0, z: 1 }, "ChessBishop.obj", "White"),
+  wu1: new Piece("Unicorn", { x: 1, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
+  wq: new Piece("Queen", { x: 2, y: 0, z: 1 }, "ChessQueen.obj", "White"),
+  wb2: new Piece("Bishop", { x: 3, y: 0, z: 1 }, "ChessBishop.obj", "White"),
+  wu2: new Piece("Unicorn", { x: 4, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
 
-  p21: new Piece("WhitePawn", { x: 0, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  p22: new Piece("WhitePawn", { x: 1, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  p23: new Piece("WhitePawn", { x: 2, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  p24: new Piece("WhitePawn", { x: 3, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  p25: new Piece("WhitePawn", { x: 4, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  p26: new Piece("WhitePawn", { x: 0, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  p27: new Piece("WhitePawn", { x: 1, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  p28: new Piece("WhitePawn", { x: 2, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  p29: new Piece("WhitePawn", { x: 3, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  p30: new Piece("WhitePawn", { x: 4, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  p31: new Piece("Rook", { x: 0, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  p32: new Piece("Knight", { x: 1, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  p33: new Piece("King", { x: 2, y: 4, z: 4 }, "ChessKing.obj", "Black"),
-  p34: new Piece("Knight", { x: 3, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  p35: new Piece("Rook", { x: 4, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  p36: new Piece("Bishop", { x: 1, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  p37: new Piece(
-    "Unicorn",
-    { x: 0, y: 4, z: 3 },
-    "ChessUnicornWhite.obj",
-    "Black"
-  ),
-  p38: new Piece("Queen", { x: 2, y: 4, z: 3 }, "ChessQueen.obj", "Black"),
-  p39: new Piece("Bishop", { x: 4, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  p40: new Piece(
-    "Unicorn",
-    { x: 3, y: 4, z: 3 },
-    "ChessUnicornWhite.obj",
-    "Black"
-  ),
+  bp1: new Piece("BlackPawn", { x: 0, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
+  bp2: new Piece("BlackPawn", { x: 1, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
+  bp3: new Piece("BlackPawn", { x: 2, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
+  bp4: new Piece("BlackPawn", { x: 3, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
+  bp5: new Piece("BlackPawn", { x: 4, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
+  bp6: new Piece("BlackPawn", { x: 0, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
+  bp7: new Piece("BlackPawn", { x: 1, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
+  bp8: new Piece("BlackPawn", { x: 2, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
+  bp9: new Piece("BlackPawn", { x: 3, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
+  bp10: new Piece("BlackPawn", { x: 4, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
+  br1: new Piece("Rook", { x: 0, y: 4, z: 4 }, "ChessRook.obj", "Black"),
+  bn1: new Piece("Knight", { x: 1, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
+  bk: new Piece("King", { x: 2, y: 4, z: 4 }, "ChessKing.obj", "Black"),
+  bn2: new Piece("Knight", { x: 3, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
+  br2: new Piece("Rook", { x: 4, y: 4, z: 4 }, "ChessRook.obj", "Black"),
+  bb1: new Piece("Bishop", { x: 1, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
+  bu1: new Piece("Unicorn", { x: 0, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
+  bq: new Piece("Queen", { x: 2, y: 4, z: 3 }, "ChessQueen.obj", "Black"),
+  bb2: new Piece("Bishop", { x: 4, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
+  bu2: new Piece("Unicorn", { x: 3, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
 };
 
 // function move(Piece, GameState, x, y, z) {
@@ -141,8 +122,10 @@ const createScene = async () => {
   const b = new BABYLON.Vector4(0, 0, 0.5, 1);
   const mat = new BABYLON.StandardMaterial("white", scene);
   const mat1 = new BABYLON.StandardMaterial("brown", scene);
+  const mat2 = new BABYLON.StandardMaterial("red", scene);
   mat.diffuseTexture = new BABYLON.Texture("/images/white.png", scene);
   mat1.diffuseTexture = new BABYLON.Texture("/images/brown.png", scene);
+  mat2.diffuseTexture = new BABYLON.Texture("/images/red.png", scene);
 
   for (let i = 0; i < 5; i += 1)
     for (let j = 0; j < 5; j += 1)
@@ -154,7 +137,7 @@ const createScene = async () => {
           frontUVs: f,
           backUVs: b,
         });
-        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 2.15);
+        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k);
         if ((j + k + i) % 2 === 1) {
           ThreeDBoard[i][j][k].material = mat1;
         } else {
@@ -171,15 +154,43 @@ const createScene = async () => {
     (await p).meshes[0].position = new BABYLON.Vector3(
       GameState[piece].coordinates.x,
       GameState[piece].coordinates.y,
-      GameState[piece].coordinates.z * 2.15 + 0.09
+      GameState[piece].coordinates.z
     );
     (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
     if (GameState[piece].color === "White") (await p).meshes[0].material = mat;
     else if (GameState[piece].color === "Black")
       (await p).meshes[0].material = mat1;
+    (await p).meshes[0].type = GameState[piece].type;
     GameRenderState[piece] = (await p).meshes[0];
   }
-
+  scene.onPointerDown = async (evt, pickInfo) => {
+    if (pickInfo.hit) {
+      console.log("clicked");
+      for (let i = 0; i < 5; i += 1)
+        for (let j = 0; j < 5; j += 1)
+          for (let k = 0; k < 5; k += 1) {
+            ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k);
+            if ((j + k + i) % 2 === 1) {
+              ThreeDBoard[i][j][k].material = mat1;
+            } else {
+              ThreeDBoard[i][j][k].material = mat;
+            }
+          }
+      // eslint-disable-next-line prefer-const
+      let movesList = await allMoves(pickInfo.pickedMesh.type, {
+        x: pickInfo.pickedMesh.position.x,
+        y: pickInfo.pickedMesh.position.y,
+        z: pickInfo.pickedMesh.position.z,
+      });
+      console.log(pickInfo.pickedMesh.position.z);
+      console.log(movesList[0].x);
+      for (let i = 0; i < movesList.length; i += 1) {
+        ThreeDBoard[movesList[i].x][movesList[i].y][
+          movesList[i].z
+        ].material = mat2;
+      }
+    }
+  };
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
   camera.setTarget(ThreeDBoard[2][2][2]);
   return scene;
@@ -202,8 +213,15 @@ const MainScreen = {
     await animateScene();
     const button = document.getElementById("MoveButton");
     button.addEventListener("click", async () => {
-      GameState.p1.coordinates.y += 1;
-      GameRenderState.p1.position.y = GameState.p1.coordinates.y;
+      //   GameState.p1.coordinates.y += 1;
+      //   GameRenderState.p1.position.y = GameState.p1.coordinates.y;
+      const print = await allMoves(GameState.p6.type, GameState.p6.coordinates);
+      console.log(print[0].x);
+      console.log(print[0].y);
+      console.log(print[0].z);
+      console.log(print[1].x);
+      console.log(print[1].y);
+      console.log(print[1].z);
     });
   },
   render: () => {
