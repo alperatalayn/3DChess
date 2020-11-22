@@ -137,7 +137,7 @@ const createScene = async () => {
           frontUVs: f,
           backUVs: b,
         });
-        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k);
+        ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 2);
         if ((j + k + i) % 2 === 1) {
           ThreeDBoard[i][j][k].material = mat1;
         } else {
@@ -154,7 +154,7 @@ const createScene = async () => {
     (await p).meshes[0].position = new BABYLON.Vector3(
       GameState[piece].coordinates.x,
       GameState[piece].coordinates.y,
-      GameState[piece].coordinates.z
+      GameState[piece].coordinates.z * 2
     );
     (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
     if (GameState[piece].color === "White") (await p).meshes[0].material = mat;
@@ -169,7 +169,6 @@ const createScene = async () => {
       for (let i = 0; i < 5; i += 1)
         for (let j = 0; j < 5; j += 1)
           for (let k = 0; k < 5; k += 1) {
-            ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k);
             if ((j + k + i) % 2 === 1) {
               ThreeDBoard[i][j][k].material = mat1;
             } else {
@@ -180,7 +179,7 @@ const createScene = async () => {
       let movesList = await allMoves(pickInfo.pickedMesh.type, {
         x: pickInfo.pickedMesh.position.x,
         y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z,
+        z: pickInfo.pickedMesh.position.z / 2,
       });
       console.log(pickInfo.pickedMesh.position.z);
       console.log(movesList[0].x);
