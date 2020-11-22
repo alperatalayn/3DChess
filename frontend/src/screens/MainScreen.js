@@ -15,6 +15,8 @@ class Piece {
     this.color = color;
   }
 }
+const deg = 1.5707;
+let pieceToMove;
 const GameRenderState = { p1: null, p2: null, p3: null, p4: null };
 let GameState = Piece[40];
 GameState = {
@@ -60,21 +62,18 @@ GameState = {
   bb2: new Piece("Bishop", { x: 4, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
   bu2: new Piece("Unicorn", { x: 3, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
 };
-
-// function move(Piece, GameState, x, y, z) {
-//   if (Piece.type === "WhitePawn") {
-//     P;
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   } else if (Piece.type === "WhitePawn") {
-//   }
-// }
-
-const deg = 1.57079633;
+const getPieceFromState = (type, coordinates) => {
+  for (const piece in GameState) {
+    if (
+      GameState[piece].type === type &&
+      GameState[piece].coordinates.x === coordinates.x &&
+      GameState[piece].coordinates.y === coordinates.y &&
+      GameState[piece].coordinates.z === coordinates.z
+    )
+      return GameState[piece];
+  }
+  return "Not Found";
+};
 const createScene = async () => {
   const canvas = document.getElementById("renderCanvas"); // Get the canvas element
   const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
@@ -166,27 +165,50 @@ const createScene = async () => {
   scene.onPointerDown = async (evt, pickInfo) => {
     if (pickInfo.hit) {
       console.log("clicked");
+      if (pickInfo.pickedMesh.status === "moveable") {
+        getPieceFromState(pieceToMove.type, {
+          x: pieceToMove.position.x,
+          y: pieceToMove.position.y,
+          z: pieceToMove.position.z / 2,
+        }).coordinates = {
+          x: pickInfo.pickedMesh.position.x,
+          y: pickInfo.pickedMesh.position.y,
+          z: pickInfo.pickedMesh.position.z / 2,
+        };
+
+        pieceToMove.position.x = pickInfo.pickedMesh.position.x;
+        pieceToMove.position.y = pickInfo.pickedMesh.position.y;
+        pieceToMove.position.z = pickInfo.pickedMesh.position.z;
+        pieceToMove = null;
+      }
       for (let i = 0; i < 5; i += 1)
         for (let j = 0; j < 5; j += 1)
           for (let k = 0; k < 5; k += 1) {
+            ThreeDBoard[i][j][k].status = "";
             if ((j + k + i) % 2 === 1) {
               ThreeDBoard[i][j][k].material = mat1;
             } else {
               ThreeDBoard[i][j][k].material = mat;
             }
           }
-      // eslint-disable-next-line prefer-const
-      let movesList = await allMoves(pickInfo.pickedMesh.type, {
-        x: pickInfo.pickedMesh.position.x,
-        y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z / 2,
-      });
-      console.log(pickInfo.pickedMesh.position.z);
-      console.log(movesList[0].x);
-      for (let i = 0; i < movesList.length; i += 1) {
-        ThreeDBoard[movesList[i].x][movesList[i].y][
-          movesList[i].z
-        ].material = mat2;
+      if (pickInfo.pickedMesh.type) {
+        const movesList = await allMoves(pickInfo.pickedMesh.type, {
+          x: pickInfo.pickedMesh.position.x,
+          y: pickInfo.pickedMesh.position.y,
+          z: pickInfo.pickedMesh.position.z / 2,
+        });
+        console.log(pickInfo.pickedMesh.position.z);
+        console.log(movesList[0].x);
+        for (let i = 0; i < movesList.length; i += 1) {
+          ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
+            "moveable";
+        }
+        for (let i = 0; i < movesList.length; i += 1) {
+          ThreeDBoard[movesList[i].x][movesList[i].y][
+            movesList[i].z
+          ].material = mat2;
+        }
+        pieceToMove = pickInfo.pickedMesh;
       }
     }
   };
