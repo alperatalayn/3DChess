@@ -4,7 +4,7 @@
 /* eslint-disable no-restricted-syntax */
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-import { allMoves } from "../moves";
+import { legalMoves } from "../moves";
 // import TwoDBoards from "../components/TwoDBoards";
 
 class Piece {
@@ -18,8 +18,8 @@ class Piece {
 const deg = 1.5707;
 let pieceToMove;
 const GameRenderState = { p1: null, p2: null, p3: null, p4: null };
-let GameState = Piece[40];
-GameState = {
+
+const GameState = {
   p1: new Piece("WhitePawn", { x: 0, y: 1, z: 0 }, "ChessPawn.obj", "White"),
   p2: new Piece("WhitePawn", { x: 1, y: 1, z: 0 }, "ChessPawn.obj", "White"),
   p3: new Piece("WhitePawn", { x: 2, y: 1, z: 0 }, "ChessPawn.obj", "White"),
@@ -192,21 +192,21 @@ const createScene = async () => {
             }
           }
       if (pickInfo.pickedMesh.type) {
-        const movesList = await allMoves(pickInfo.pickedMesh.type, {
-          x: pickInfo.pickedMesh.position.x,
-          y: pickInfo.pickedMesh.position.y,
-          z: pickInfo.pickedMesh.position.z / 2,
-        });
-        console.log(pickInfo.pickedMesh.position.z);
-        console.log(movesList[0].x);
-        for (let i = 0; i < movesList.length; i += 1) {
-          ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
-            "moveable";
-        }
+        const movesList = await legalMoves(
+          GameState,
+          pickInfo.pickedMesh.type,
+          {
+            x: pickInfo.pickedMesh.position.x,
+            y: pickInfo.pickedMesh.position.y,
+            z: pickInfo.pickedMesh.position.z / 2,
+          }
+        );
         for (let i = 0; i < movesList.length; i += 1) {
           ThreeDBoard[movesList[i].x][movesList[i].y][
             movesList[i].z
           ].material = mat2;
+          ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
+            "moveable";
         }
         pieceToMove = pickInfo.pickedMesh;
       }
@@ -233,17 +233,7 @@ const MainScreen = {
   after_render: async () => {
     await animateScene();
     const button = document.getElementById("MoveButton");
-    button.addEventListener("click", async () => {
-      //   GameState.p1.coordinates.y += 1;
-      //   GameRenderState.p1.position.y = GameState.p1.coordinates.y;
-      const print = await allMoves(GameState.p6.type, GameState.p6.coordinates);
-      console.log(print[0].x);
-      console.log(print[0].y);
-      console.log(print[0].z);
-      console.log(print[1].x);
-      console.log(print[1].y);
-      console.log(print[1].z);
-    });
+    button.addEventListener("click", async () => {});
   },
   render: () => {
     return `<div>
