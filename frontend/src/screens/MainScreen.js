@@ -4,68 +4,20 @@
 /* eslint-disable no-restricted-syntax */
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
+import { initialState } from "../config";
+import { getGameState, setGameState } from "../localStorage";
 import { legalMoves } from "../moves";
 // import TwoDBoards from "../components/TwoDBoards";
 
-class Piece {
-  constructor(type, { x, y, z }, obj, color) {
-    this.obj = obj;
-    this.coordinates = { x, y, z };
-    this.type = type;
-    this.color = color;
-  }
-}
 const deg = 1.5707;
-let pieceToMove;
-const GameRenderState = { p1: null, p2: null, p3: null, p4: null };
+let pieceToMove = null;
+if (!getGameState()) setGameState(initialState);
+const GameState = getGameState();
+console.log(GameState || "Not Found");
 
-const GameState = {
-  p1: new Piece("WhitePawn", { x: 0, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p2: new Piece("WhitePawn", { x: 1, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p3: new Piece("WhitePawn", { x: 2, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p4: new Piece("WhitePawn", { x: 3, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p5: new Piece("WhitePawn", { x: 4, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p6: new Piece("WhitePawn", { x: 0, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p7: new Piece("WhitePawn", { x: 1, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p8: new Piece("WhitePawn", { x: 2, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p9: new Piece("WhitePawn", { x: 3, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p10: new Piece("WhitePawn", { x: 4, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  wr1: new Piece("Rook", { x: 0, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  wn1: new Piece("Knight", { x: 1, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  wk: new Piece("King", { x: 2, y: 0, z: 0 }, "ChessKing.obj", "White"),
-  wn2: new Piece("Knight", { x: 3, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  wr2: new Piece("Rook", { x: 4, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  wb1: new Piece("Bishop", { x: 0, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  wu1: new Piece("Unicorn", { x: 1, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
-  wq: new Piece("Queen", { x: 2, y: 0, z: 1 }, "ChessQueen.obj", "White"),
-  wb2: new Piece("Bishop", { x: 3, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  wu2: new Piece("Unicorn", { x: 4, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
-
-  bp1: new Piece("BlackPawn", { x: 0, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp2: new Piece("BlackPawn", { x: 1, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp3: new Piece("BlackPawn", { x: 2, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp4: new Piece("BlackPawn", { x: 3, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp5: new Piece("BlackPawn", { x: 4, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp6: new Piece("BlackPawn", { x: 0, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp7: new Piece("BlackPawn", { x: 1, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp8: new Piece("BlackPawn", { x: 2, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp9: new Piece("BlackPawn", { x: 3, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp10: new Piece("BlackPawn", { x: 4, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  br1: new Piece("Rook", { x: 0, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  bn1: new Piece("Knight", { x: 1, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  bk: new Piece("King", { x: 2, y: 4, z: 4 }, "ChessKing.obj", "Black"),
-  bn2: new Piece("Knight", { x: 3, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  br2: new Piece("Rook", { x: 4, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  bb1: new Piece("Bishop", { x: 1, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  bu1: new Piece("Unicorn", { x: 0, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
-  bq: new Piece("Queen", { x: 2, y: 4, z: 3 }, "ChessQueen.obj", "Black"),
-  bb2: new Piece("Bishop", { x: 4, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  bu2: new Piece("Unicorn", { x: 3, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
-};
-const getPieceFromState = (type, coordinates) => {
+const getPieceFromState = (coordinates) => {
   for (const piece in GameState) {
     if (
-      GameState[piece].type === type &&
       GameState[piece].coordinates.x === coordinates.x &&
       GameState[piece].coordinates.y === coordinates.y &&
       GameState[piece].coordinates.z === coordinates.z
@@ -74,6 +26,28 @@ const getPieceFromState = (type, coordinates) => {
   }
   return "Not Found";
 };
+const deletePieceFromState = (pieceInput, scene) => {
+  scene
+    .getMeshByName(getKeyByValue(GameState, pieceInput.coordinates))
+    .dispose();
+  console.log(
+    scene.getMeshByName(getKeyByValue(GameState, pieceInput.coordinates))
+  );
+  for (const piece in GameState) {
+    if (GameState[piece] === pieceInput) {
+      delete GameState[piece];
+    }
+  }
+  return "Not Found";
+};
+function getKeyByValue(object, coordinates) {
+  return Object.keys(object).find(
+    (key) =>
+      object[key].coordinates.x === coordinates.x &&
+      object[key].coordinates.y === coordinates.y &&
+      object[key].coordinates.z === coordinates.z
+  );
+}
 const createScene = async () => {
   const canvas = document.getElementById("renderCanvas"); // Get the canvas element
   const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
@@ -81,7 +55,7 @@ const createScene = async () => {
   const scene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera(
     "cam",
-    0,
+    (deg * 3) / 3,
     (deg * 3) / 2,
     15,
     new BABYLON.Vector3(0, 0, 0),
@@ -98,7 +72,6 @@ const createScene = async () => {
 
   camera.lowerBetaLimit = deg;
   camera.upperBetaLimit = deg * 2;
-
   camera.lowerRadiusLimit = 12.5;
   camera.upperRadiusLimit = 22.5;
   const light = new BABYLON.HemisphericLight(
@@ -119,12 +92,23 @@ const createScene = async () => {
 
   const f = new BABYLON.Vector4(0.5, 0, 1, 1);
   const b = new BABYLON.Vector4(0, 0, 0.5, 1);
-  const mat = new BABYLON.StandardMaterial("white", scene);
-  const mat1 = new BABYLON.StandardMaterial("brown", scene);
-  const mat2 = new BABYLON.StandardMaterial("red", scene);
-  mat.diffuseTexture = new BABYLON.Texture("/images/white.png", scene);
-  mat1.diffuseTexture = new BABYLON.Texture("/images/brown.png", scene);
-  mat2.diffuseTexture = new BABYLON.Texture("/images/red.png", scene);
+  const whiteMaterial = new BABYLON.StandardMaterial("white", scene);
+  const brownMaterial = new BABYLON.StandardMaterial("brown", scene);
+  const redMaterial = new BABYLON.StandardMaterial("red", scene);
+  const greenMaterial = new BABYLON.StandardMaterial("green", scene);
+  whiteMaterial.diffuseTexture = new BABYLON.Texture(
+    "/images/white.png",
+    scene
+  );
+  brownMaterial.diffuseTexture = new BABYLON.Texture(
+    "/images/brown.png",
+    scene
+  );
+  redMaterial.diffuseTexture = new BABYLON.Texture("/images/red.png", scene);
+  greenMaterial.diffuseTexture = new BABYLON.Texture(
+    "/images/green.png",
+    scene
+  );
 
   for (let i = 0; i < 5; i += 1)
     for (let j = 0; j < 5; j += 1)
@@ -138,9 +122,9 @@ const createScene = async () => {
         });
         ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 2);
         if ((j + k + i) % 2 === 1) {
-          ThreeDBoard[i][j][k].material = mat1;
+          ThreeDBoard[i][j][k].material = brownMaterial;
         } else {
-          ThreeDBoard[i][j][k].material = mat;
+          ThreeDBoard[i][j][k].material = whiteMaterial;
         }
       }
   for (const piece in GameState) {
@@ -156,17 +140,58 @@ const createScene = async () => {
       GameState[piece].coordinates.z * 2
     );
     (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
-    if (GameState[piece].color === "White") (await p).meshes[0].material = mat;
+    if (GameState[piece].color === "White")
+      (await p).meshes[0].material = whiteMaterial;
     else if (GameState[piece].color === "Black")
-      (await p).meshes[0].material = mat1;
+      (await p).meshes[0].material = brownMaterial;
     (await p).meshes[0].type = GameState[piece].type;
-    GameRenderState[piece] = (await p).meshes[0];
+    (await p).meshes[0].color = GameState[piece].color;
+    (await p).meshes[0].name = piece;
+    (await p).meshes[0].status = "";
   }
   scene.onPointerDown = async (evt, pickInfo) => {
     if (pickInfo.hit) {
-      console.log("clicked");
-      if (pickInfo.pickedMesh.status === "moveable") {
-        getPieceFromState(pieceToMove.type, {
+      if (
+        pickInfo.pickedMesh.type &&
+        pieceToMove === null &&
+        pickInfo.pickedMesh.status === ""
+      ) {
+        const movesList = await legalMoves(
+          GameState,
+          pickInfo.pickedMesh.type,
+          {
+            x: pickInfo.pickedMesh.position.x,
+            y: pickInfo.pickedMesh.position.y,
+            z: pickInfo.pickedMesh.position.z / 2,
+          },
+          pickInfo.pickedMesh.color
+        );
+        for (let i = 0; i < movesList.length; i += 1) {
+          if (movesList[i].type === "") {
+            ThreeDBoard[movesList[i].x][movesList[i].y][
+              movesList[i].z
+            ].material = greenMaterial;
+            ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
+              "moveable";
+          } else if (movesList[i].type === "Capture") {
+            ThreeDBoard[movesList[i].x][movesList[i].y][
+              movesList[i].z
+            ].material = redMaterial;
+            ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
+              "can-capture";
+            scene.getMeshByName(
+              getKeyByValue(GameState, {
+                x: movesList[i].x,
+                y: movesList[i].y,
+                z: movesList[i].z,
+              })
+            ).status = "can-capture";
+          }
+        }
+        pieceToMove = pickInfo.pickedMesh;
+        console.log(pieceToMove);
+      } else if (pickInfo.pickedMesh.status === "moveable") {
+        getPieceFromState({
           x: pieceToMove.position.x,
           y: pieceToMove.position.y,
           z: pieceToMove.position.z / 2,
@@ -179,36 +204,69 @@ const createScene = async () => {
         pieceToMove.position.x = pickInfo.pickedMesh.position.x;
         pieceToMove.position.y = pickInfo.pickedMesh.position.y;
         pieceToMove.position.z = pickInfo.pickedMesh.position.z;
-        pieceToMove = null;
-      }
-      for (let i = 0; i < 5; i += 1)
-        for (let j = 0; j < 5; j += 1)
-          for (let k = 0; k < 5; k += 1) {
-            ThreeDBoard[i][j][k].status = "";
-            if ((j + k + i) % 2 === 1) {
-              ThreeDBoard[i][j][k].material = mat1;
-            } else {
-              ThreeDBoard[i][j][k].material = mat;
+        for (let i = 0; i < 5; i += 1)
+          for (let j = 0; j < 5; j += 1)
+            for (let k = 0; k < 5; k += 1) {
+              if ((j + k + i) % 2 === 1) {
+                ThreeDBoard[i][j][k].material = brownMaterial;
+              } else {
+                ThreeDBoard[i][j][k].material = whiteMaterial;
+              }
             }
-          }
-      if (pickInfo.pickedMesh.type) {
-        const movesList = await legalMoves(
-          GameState,
-          pickInfo.pickedMesh.type,
-          {
+        for (const i in scene.meshes) {
+          scene.meshes[i].status = "";
+        }
+
+        pieceToMove = null;
+      } else if (pickInfo.pickedMesh.status === "can-capture") {
+        deletePieceFromState(
+          getPieceFromState({
             x: pickInfo.pickedMesh.position.x,
             y: pickInfo.pickedMesh.position.y,
             z: pickInfo.pickedMesh.position.z / 2,
-          }
+          }),
+          scene
         );
-        for (let i = 0; i < movesList.length; i += 1) {
-          ThreeDBoard[movesList[i].x][movesList[i].y][
-            movesList[i].z
-          ].material = mat2;
-          ThreeDBoard[movesList[i].x][movesList[i].y][movesList[i].z].status =
-            "moveable";
+        getPieceFromState({
+          x: pieceToMove.position.x,
+          y: pieceToMove.position.y,
+          z: pieceToMove.position.z / 2,
+        }).coordinates = {
+          x: pickInfo.pickedMesh.position.x,
+          y: pickInfo.pickedMesh.position.y,
+          z: pickInfo.pickedMesh.position.z / 2,
+        };
+
+        pieceToMove.position.x = pickInfo.pickedMesh.position.x;
+        pieceToMove.position.y = pickInfo.pickedMesh.position.y;
+        pieceToMove.position.z = pickInfo.pickedMesh.position.z;
+        for (let i = 0; i < 5; i += 1)
+          for (let j = 0; j < 5; j += 1)
+            for (let k = 0; k < 5; k += 1) {
+              if ((j + k + i) % 2 === 1) {
+                ThreeDBoard[i][j][k].material = brownMaterial;
+              } else {
+                ThreeDBoard[i][j][k].material = whiteMaterial;
+              }
+            }
+        for (const i in scene.meshes) {
+          scene.meshes[i].status = "";
         }
-        pieceToMove = pickInfo.pickedMesh;
+        pieceToMove = null;
+      } else {
+        for (let i = 0; i < 5; i += 1)
+          for (let j = 0; j < 5; j += 1)
+            for (let k = 0; k < 5; k += 1) {
+              if ((j + k + i) % 2 === 1) {
+                ThreeDBoard[i][j][k].material = brownMaterial;
+              } else {
+                ThreeDBoard[i][j][k].material = whiteMaterial;
+              }
+            }
+        for (const i in scene.meshes) {
+          scene.meshes[i].status = "";
+        }
+        pieceToMove = null;
       }
     }
   };
@@ -233,7 +291,10 @@ const MainScreen = {
   after_render: async () => {
     await animateScene();
     const button = document.getElementById("MoveButton");
-    button.addEventListener("click", async () => {});
+    button.addEventListener("click", async () => {
+      setGameState(GameState);
+      console.log(getGameState());
+    });
   },
   render: () => {
     return `<div>
