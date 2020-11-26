@@ -6,33 +6,18 @@ import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { initialState } from "../config";
 import { getGameState, setGameState } from "../localStorage";
-import { legalMoves } from "../moves";
+import { getPieceFromState, inCheckMoves, isCheck, legalMoves } from "../moves";
 // import TwoDBoards from "../components/TwoDBoards";
 
 const deg = 1.5707;
 let pieceToMove = null;
 if (!getGameState()) setGameState(initialState);
 const GameState = getGameState();
-console.log(GameState || "Not Found");
 
-const getPieceFromState = (coordinates) => {
-  for (const piece in GameState) {
-    if (
-      GameState[piece].coordinates.x === coordinates.x &&
-      GameState[piece].coordinates.y === coordinates.y &&
-      GameState[piece].coordinates.z === coordinates.z
-    )
-      return GameState[piece];
-  }
-  return "Not Found";
-};
 const deletePieceFromState = (pieceInput, scene) => {
   scene
     .getMeshByName(getKeyByValue(GameState, pieceInput.coordinates))
     .dispose();
-  console.log(
-    scene.getMeshByName(getKeyByValue(GameState, pieceInput.coordinates))
-  );
   for (const piece in GameState) {
     if (GameState[piece] === pieceInput) {
       delete GameState[piece];
@@ -156,16 +141,46 @@ const createScene = async () => {
         pieceToMove === null &&
         pickInfo.pickedMesh.status === ""
       ) {
-        const movesList = await legalMoves(
-          GameState,
-          pickInfo.pickedMesh.type,
-          {
-            x: pickInfo.pickedMesh.position.x,
-            y: pickInfo.pickedMesh.position.y,
-            z: pickInfo.pickedMesh.position.z / 2,
-          },
-          pickInfo.pickedMesh.color
-        );
+        let movesList;
+        if (
+          (await isCheck(
+            GameState,
+            GameState.wk.coordinates,
+            GameState.wk.color
+          )) === true
+        ) {
+          movesList = await inCheckMoves(
+            await legalMoves(
+              GameState,
+              pickInfo.pickedMesh.type,
+              {
+                x: pickInfo.pickedMesh.position.x,
+                y: pickInfo.pickedMesh.position.y,
+                z: pickInfo.pickedMesh.position.z / 2,
+              },
+              pickInfo.pickedMesh.color
+            ),
+            GameState,
+            {
+              x: pickInfo.pickedMesh.position.x,
+              y: pickInfo.pickedMesh.position.y,
+              z: pickInfo.pickedMesh.position.z / 2,
+            },
+            pickInfo.pickedMesh.color
+          );
+        } else {
+          movesList = await legalMoves(
+            GameState,
+            pickInfo.pickedMesh.type,
+            {
+              x: pickInfo.pickedMesh.position.x,
+              y: pickInfo.pickedMesh.position.y,
+              z: pickInfo.pickedMesh.position.z / 2,
+            },
+            pickInfo.pickedMesh.color
+          );
+        }
+
         for (let i = 0; i < movesList.length; i += 1) {
           if (movesList[i].type === "") {
             ThreeDBoard[movesList[i].x][movesList[i].y][
@@ -189,9 +204,8 @@ const createScene = async () => {
           }
         }
         pieceToMove = pickInfo.pickedMesh;
-        console.log(pieceToMove);
       } else if (pickInfo.pickedMesh.status === "moveable") {
-        getPieceFromState({
+        getPieceFromState(GameState, {
           x: pieceToMove.position.x,
           y: pieceToMove.position.y,
           z: pieceToMove.position.z / 2,
@@ -220,14 +234,14 @@ const createScene = async () => {
         pieceToMove = null;
       } else if (pickInfo.pickedMesh.status === "can-capture") {
         deletePieceFromState(
-          getPieceFromState({
+          getPieceFromState(GameState, {
             x: pickInfo.pickedMesh.position.x,
             y: pickInfo.pickedMesh.position.y,
             z: pickInfo.pickedMesh.position.z / 2,
           }),
           scene
         );
-        getPieceFromState({
+        getPieceFromState(GameState, {
           x: pieceToMove.position.x,
           y: pieceToMove.position.y,
           z: pieceToMove.position.z / 2,
@@ -293,7 +307,7 @@ const MainScreen = {
     const button = document.getElementById("MoveButton");
     button.addEventListener("click", async () => {
       setGameState(GameState);
-      console.log(getGameState());
+      isCheck(GameState, GameState.wk.coordinates, GameState.wk.color);
     });
   },
   render: () => {

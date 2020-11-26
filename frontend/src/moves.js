@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable guard-for-in */
+
 /* eslint-disable no-restricted-syntax */
 class Coordinates {
   constructor(x, y, z, status = "") {
@@ -18,6 +21,46 @@ function onlyInFirst(first, second) {
   }
   return newArr;
 }
+const deletePieceFromState = (pieceInput, GameState) => {
+  for (const piece in GameState) {
+    if (GameState[piece] === pieceInput) {
+      // eslint-disable-next-line no-param-reassign
+      delete GameState[piece];
+    }
+  }
+  return "Not Found";
+};
+function afterMove(coordinates, move, gameState) {
+  // eslint-disable-next-line prefer-object-spread
+  const newState = JSON.parse(JSON.stringify(gameState));
+  const piece = getPieceFromState(newState, coordinates);
+  for (const i in newState) {
+    if (
+      newState[i].coordinates.x === move.x &&
+      newState[i].coordinates.y === move.y &&
+      newState[i].coordinates.z === move.z
+    )
+      deletePieceFromState(
+        getPieceFromState(newState, { x: move.x, y: move.y, z: move.z }),
+        newState
+      );
+  }
+  piece.coordinates.x = move.x;
+  piece.coordinates.y = move.y;
+  piece.coordinates.z = move.z;
+  return newState;
+}
+export const getPieceFromState = (GameState, coordinates) => {
+  for (const piece in GameState) {
+    if (
+      GameState[piece].coordinates.x === coordinates.x &&
+      GameState[piece].coordinates.y === coordinates.y &&
+      GameState[piece].coordinates.z === coordinates.z
+    )
+      return GameState[piece];
+  }
+  return "Not Found";
+};
 
 export const allMoves = async (type, coordinates) => {
   // eslint-disable-next-line prefer-const
@@ -1119,6 +1162,19 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
   let j = 0;
   if (type === "BlackPawn") {
     for (const i in gameState) {
+      for (const move in movesList) {
+        if (
+          (coordinates.y - 1 === gameState[i].coordinates.y &&
+            coordinates.y - 1 === movesList[move].y &&
+            coordinates.z === gameState[i].coordinates.z &&
+            coordinates.z === movesList[move].z) ||
+          (coordinates.y === gameState[i].coordinates.y &&
+            coordinates.y === movesList[move].y &&
+            coordinates.z - 1 === gameState[i].coordinates.z &&
+            coordinates.z - 1 === movesList[move].z)
+        )
+          illegalMovesList.push(movesList[move]);
+      }
       if (
         coordinates.x - 1 > -1 &&
         coordinates.y - 1 > -1 &&
@@ -1203,6 +1259,19 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
     }
   } else if (type === "WhitePawn") {
     for (const i in gameState) {
+      for (const move in movesList) {
+        if (
+          (coordinates.y + 1 === gameState[i].coordinates.y &&
+            coordinates.y + 1 === movesList[move].y &&
+            coordinates.z === gameState[i].coordinates.z &&
+            coordinates.z === movesList[move].z) ||
+          (coordinates.y === gameState[i].coordinates.y &&
+            coordinates.y === movesList[move].y &&
+            coordinates.z + 1 === gameState[i].coordinates.z &&
+            coordinates.z + 1 === movesList[move].z)
+        )
+          illegalMovesList.push(movesList[move]);
+      }
       if (
         coordinates.x - 1 > -1 &&
         coordinates.y + 1 < 5 &&
@@ -1383,5 +1452,49 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
       j += 1;
     }
   }
+
   return onlyInFirst(movesList, illegalMovesList);
+};
+
+export const isCheck = async (gameState, coordinates, color) => {
+  let isInCheck = false;
+  for (const i in gameState) {
+    if (gameState[i].color !== color) {
+      const movesList = await legalMoves(
+        gameState,
+        gameState[i].type,
+        gameState[i].coordinates,
+        gameState[i].color
+      );
+      for (const j in movesList) {
+        if (
+          movesList[j].x === coordinates.x &&
+          movesList[j].y === coordinates.y &&
+          movesList[j].z === coordinates.z
+        ) {
+          isInCheck = true;
+        }
+      }
+    }
+  }
+  console.log(isInCheck);
+  return isInCheck;
+};
+
+// this function returns
+export const inCheckMoves = async (legalMovesList, gameState, coordinates) => {
+  const resultList = [];
+  for (const i in legalMovesList) {
+    if (
+      (await isCheck(
+        afterMove(coordinates, legalMovesList[i], gameState),
+        gameState.wk.coordinates,
+        gameState.wk.color
+      )) === false
+    ) {
+      console.log(legalMovesList);
+      resultList.push(legalMovesList[i]);
+    }
+  }
+  return resultList;
 };
