@@ -26,7 +26,7 @@ export const getUserInfo = () => {
     ? JSON.parse(localStorage.getItem("userInfo"))
     : { _id: "", name: "", email: "", password: "" };
 };
-export const setGameState = (gamestate) => {
+export const setGameState = async (gamestate) => {
   localStorage.setItem(
     "gameState",
     JSON.stringify({

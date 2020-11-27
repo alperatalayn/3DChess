@@ -7,53 +7,34 @@ import "babylonjs-loaders";
 import io from "socket.io-client";
 import { initialState } from "../config";
 import { getGameState, getUserInfo, setGameState } from "../localStorage";
-import { getPieceFromState, inCheckMoves, isCheck, legalMoves } from "../moves";
+import { checkMate, finalMoves, getPieceFromState } from "../moves";
 // import TwoDBoards from "../components/TwoDBoards";
-const user = getUserInfo();
 const socket = io("http://localhost:5000");
-socket.on("connection", () => {});
-socket.emit("userconnected", { name: user.name });
+
+export const connect = async () => {
+  const user = getUserInfo().name;
+  socket.on("connection", () => {});
+  socket.emit("userconnected", { name: user.name });
+};
+export const sendMoveToServer = async (movedPiece, pickInfo) => {
+  socket.emit("sendMove", {
+    piece: movedPiece,
+    position: pickInfo.pickedMesh.position,
+  });
+};
 const deg = 1.5707;
 let pieceToMove = null;
 if (!getGameState()) setGameState(initialState);
-let GameState = getGameState();
+const GameState = getGameState();
 const getMoves = async (pickInfo) => {
-  let movesList;
-  if (
-    (await isCheck(GameState, GameState.wk.coordinates, GameState.wk.color)) ===
-    true
-  ) {
-    movesList = await inCheckMoves(
-      await legalMoves(
-        GameState,
-        pickInfo.pickedMesh.type,
-        {
-          x: pickInfo.pickedMesh.position.x,
-          y: pickInfo.pickedMesh.position.y,
-          z: pickInfo.pickedMesh.position.z / 2,
-        },
-        pickInfo.pickedMesh.color
-      ),
-      GameState,
-      {
-        x: pickInfo.pickedMesh.position.x,
-        y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z / 2,
-      },
-      pickInfo.pickedMesh.color
-    );
-  } else {
-    movesList = await legalMoves(
-      GameState,
-      pickInfo.pickedMesh.type,
-      {
-        x: pickInfo.pickedMesh.position.x,
-        y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z / 2,
-      },
-      pickInfo.pickedMesh.color
-    );
-  }
+  const movesList = await finalMoves(
+    GameState,
+    getPieceFromState(GameState, {
+      x: pickInfo.pickedMesh.position.x,
+      y: pickInfo.pickedMesh.position.y,
+      z: pickInfo.pickedMesh.position.z / 2,
+    })
+  );
   return movesList;
 };
 const deletePieceFromState = async (pieceInput, scene) => {
@@ -63,7 +44,7 @@ const deletePieceFromState = async (pieceInput, scene) => {
   for (const piece in GameState) {
     if (GameState[piece] === pieceInput && GameState[piece].type !== "King") {
       delete GameState[piece];
-      setGameState(GameState);
+      await setGameState(GameState);
     }
   }
   return "Not Found";
@@ -77,6 +58,7 @@ const getKeyByValue = (object, coordinates) => {
   );
 };
 
+connect();
 const createScene = async () => {
   const canvas = document.getElementById("renderCanvas"); // Get the canvas element
   const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
@@ -203,94 +185,7 @@ const createScene = async () => {
     }
     pieceToMove = pickInfo.pickedMesh;
   };
-  const move = async (pickInfo) => {
-    if (pickInfo.pickedMesh.status === "moveable") {
-      getPieceFromState(GameState, {
-        x: pieceToMove.position.x,
-        y: pieceToMove.position.y,
-        z: pieceToMove.position.z / 2,
-      }).coordinates = {
-        x: pickInfo.pickedMesh.position.x,
-        y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z / 2,
-      };
-      pieceToMove.position.x = pickInfo.pickedMesh.position.x;
-      pieceToMove.position.y = pickInfo.pickedMesh.position.y;
-      pieceToMove.position.z = pickInfo.pickedMesh.position.z;
-      for (let i = 0; i < 5; i += 1)
-        for (let j = 0; j < 5; j += 1)
-          for (let k = 0; k < 5; k += 1) {
-            if ((j + k + i) % 2 === 1) {
-              ThreeDBoard[i][j][k].material = brownMaterial;
-            } else {
-              ThreeDBoard[i][j][k].material = whiteMaterial;
-            }
-          }
-      for (const i in scene.meshes) {
-        scene.meshes[i].status = "";
-      }
-    } else if (pickInfo.pickedMesh.status === "can-capture") {
-      deletePieceFromState(
-        getPieceFromState(GameState, {
-          x: pickInfo.pickedMesh.position.x,
-          y: pickInfo.pickedMesh.position.y,
-          z: pickInfo.pickedMesh.position.z / 2,
-        }),
-        scene
-      );
-      getPieceFromState(GameState, {
-        x: pieceToMove.position.x,
-        y: pieceToMove.position.y,
-        z: pieceToMove.position.z / 2,
-      }).coordinates = {
-        x: pickInfo.pickedMesh.position.x,
-        y: pickInfo.pickedMesh.position.y,
-        z: pickInfo.pickedMesh.position.z / 2,
-      };
-      pieceToMove.position.x = pickInfo.pickedMesh.position.x;
-      pieceToMove.position.y = pickInfo.pickedMesh.position.y;
-      pieceToMove.position.z = pickInfo.pickedMesh.position.z;
-      for (let i = 0; i < 5; i += 1)
-        for (let j = 0; j < 5; j += 1)
-          for (let k = 0; k < 5; k += 1) {
-            if ((j + k + i) % 2 === 1) {
-              ThreeDBoard[i][j][k].material = brownMaterial;
-            } else {
-              ThreeDBoard[i][j][k].material = whiteMaterial;
-            }
-          }
-      for (const i in scene.meshes) {
-        scene.meshes[i].status = "";
-      }
-    }
-    setGameState(GameState);
-    pieceToMove = null;
-  };
-
-  socket.on("NewState", async (data) => {
-    if (
-      getPieceFromState(GameState, {
-        x: data.position.x,
-        y: data.position.y,
-        z: data.position.z / 2,
-      }) !== null
-    ) {
-      deletePieceFromState(
-        getPieceFromState(GameState, {
-          x: data.position.x,
-          y: data.position.y,
-          z: data.position.z / 2,
-        }),
-        scene
-      );
-    }
-
-    scene.getMeshByName(data.piece).position = data.position;
-    setGameState(data.NewState);
-    GameState = getGameState();
-    console.log(data.position);
-  });
-  const setBoardDefault = () => {
+  const setBoardDefault = async () => {
     for (let i = 0; i < 5; i += 1)
       for (let j = 0; j < 5; j += 1)
         for (let k = 0; k < 5; k += 1) {
@@ -319,18 +214,34 @@ const createScene = async () => {
         pickInfo.pickedMesh.status === "can-capture"
       ) {
         const movedPiece = pieceToMove.name;
-        console.log(pieceToMove.name);
-        move(pickInfo);
-        socket.emit("clientEvent", {
-          NewState: GameState,
-          piece: movedPiece,
-          position: pickInfo.pickedMesh.position,
-        });
+        // move(pickInfo);
+        sendMoveToServer(movedPiece, pickInfo);
       } else {
-        setBoardDefault();
+        await setBoardDefault();
       }
     }
   };
+
+  socket.on("getMove", async (data) => {
+    for (const i in GameState) {
+      if (
+        GameState[i].coordinates.x === data.position._x &&
+        GameState[i].coordinates.y === data.position._y &&
+        GameState[i].coordinates.z === data.position._z / 2
+      ) {
+        await deletePieceFromState(GameState[i], scene);
+      }
+    }
+    GameState[data.piece].coordinates.x = data.position._x;
+    GameState[data.piece].coordinates.y = data.position._y;
+    GameState[data.piece].coordinates.z = data.position._z / 2;
+    scene.getMeshByName(data.piece).position.x = data.position._x;
+    scene.getMeshByName(data.piece).position.y = data.position._y;
+    scene.getMeshByName(data.piece).position.z = data.position._z;
+    await setGameState(GameState);
+    await setBoardDefault();
+    checkMate(GameState);
+  });
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
   camera.setTarget(ThreeDBoard[2][2][2]);
   return scene;
@@ -352,9 +263,7 @@ const MainScreen = {
   after_render: async () => {
     await animateScene();
     const button = document.getElementById("MoveButton");
-    button.addEventListener("click", async () => {
-      isCheck(GameState, GameState.wk.coordinates, GameState.wk.color);
-    });
+    button.addEventListener("click", async () => {});
   },
   render: () => {
     return `<div>

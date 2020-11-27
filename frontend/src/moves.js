@@ -30,10 +30,10 @@ const deletePieceFromState = (pieceInput, GameState) => {
   }
   return "Not Found";
 };
-export const afterMove = async (coordinates, move, gameState) => {
+export const afterMove = async (piece, move, gameState) => {
   // eslint-disable-next-line prefer-object-spread
   const newState = JSON.parse(JSON.stringify(gameState));
-  const piece = getPieceFromState(newState, coordinates);
+  const temppiece = getPieceFromState(newState, piece.coordinates);
   for (const i in newState) {
     if (
       newState[i].coordinates.x === move.x &&
@@ -45,9 +45,9 @@ export const afterMove = async (coordinates, move, gameState) => {
         newState
       );
   }
-  piece.coordinates.x = move.x;
-  piece.coordinates.y = move.y;
-  piece.coordinates.z = move.z;
+  temppiece.coordinates.x = move.x;
+  temppiece.coordinates.y = move.y;
+  temppiece.coordinates.z = move.z;
   return newState;
 };
 export const getPieceFromState = (GameState, coordinates) => {
@@ -62,1089 +62,1089 @@ export const getPieceFromState = (GameState, coordinates) => {
   return null;
 };
 
-export const allMoves = async (type, coordinates) => {
+export const allMoves = async (piece) => {
   // eslint-disable-next-line prefer-const
   let movesList = [];
-  if (type === "WhitePawn") {
+  if (piece.type === "WhitePawn") {
     let counter = 0;
-    if (coordinates.y + 1 < 5) {
+    if (piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.z + 1 < 5) {
+    if (piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-  } else if (type === "BlackPawn") {
+  } else if (piece.type === "BlackPawn") {
     let counter = 0;
-    if (coordinates.y - 1 > -1) {
+    if (piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.z - 1 > -1) {
+    if (piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
-  } else if (type === "Rook") {
+  } else if (piece.type === "Rook") {
     let counter = 0;
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5) {
+      if (piece.coordinates.x + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1) {
+      if (piece.coordinates.x - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5) {
+      if (piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1) {
+      if (piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.z + i < 5) {
+      if (piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
 
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.z - i > -1) {
+      if (piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
-  } else if (type === "Bishop") {
+  } else if (piece.type === "Bishop") {
     let counter = 0;
     // x and y axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.y + i < 5) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.y - i > -1) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.y + i < 5) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.y - i > -1) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     // x and z axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.z + i < 5) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.z - i > -1) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.z + i < 5) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.z - i > -1) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     // y and z axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5 && coordinates.z + i < 5) {
+      if (piece.coordinates.y + i < 5 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5 && coordinates.z - i > -1) {
+      if (piece.coordinates.y + i < 5 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1 && coordinates.z + i < 5) {
+      if (piece.coordinates.y - i > -1 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1 && coordinates.z - i > -1) {
+      if (piece.coordinates.y - i > -1 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z - i
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
-  } else if (type === "Knight") {
+  } else if (piece.type === "Knight") {
     let counter = 0;
     // x-2 and y-1 axis movements/
-    if (coordinates.x + 2 < 5 && coordinates.y + 1 < 5) {
+    if (piece.coordinates.x + 2 < 5 && piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 2,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x + 2,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x + 2 < 5 && coordinates.y - 1 > -1) {
+    if (piece.coordinates.x + 2 < 5 && piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 2,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x + 2,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 2 > -1 && coordinates.y + 1 < 5) {
+    if (piece.coordinates.x - 2 > -1 && piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 2,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x - 2,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 2 > -1 && coordinates.y - 1 > -1) {
+    if (piece.coordinates.x - 2 > -1 && piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 2,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x - 2,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
     // x-1 and y-2 axis movements
-    if (coordinates.x + 1 < 5 && coordinates.y + 2 < 5) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.y + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y + 2,
-        coordinates.z
+        piece.coordinates.x + 1,
+        piece.coordinates.y + 2,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x + 1 < 5 && coordinates.y - 2 > -1) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.y - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y - 2,
-        coordinates.z
+        piece.coordinates.x + 1,
+        piece.coordinates.y - 2,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.y + 2 < 5) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.y + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y + 2,
-        coordinates.z
+        piece.coordinates.x - 1,
+        piece.coordinates.y + 2,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.y - 2 > -1) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.y - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y - 2,
-        coordinates.z
+        piece.coordinates.x - 1,
+        piece.coordinates.y - 2,
+        piece.coordinates.z
       );
       counter += 1;
     }
     // x-2 and z-1 axis movements
-    if (coordinates.x + 2 < 5 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.x + 2 < 5 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 2,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x + 2,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.x + 2 < 5 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.x + 2 < 5 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 2,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x + 2,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
-    if (coordinates.x - 2 > -1 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.x - 2 > -1 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 2,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x - 2,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.x - 2 > -1 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.x - 2 > -1 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 2,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x - 2,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     // x-1 and z-2 axis movements
-    if (coordinates.x + 1 < 5 && coordinates.z + 2 < 5) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.z + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y,
-        coordinates.z + 2
+        piece.coordinates.x + 1,
+        piece.coordinates.y,
+        piece.coordinates.z + 2
       );
       counter += 1;
     }
-    if (coordinates.x + 1 < 5 && coordinates.z - 2 > -1) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.z - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y,
-        coordinates.z - 2
+        piece.coordinates.x + 1,
+        piece.coordinates.y,
+        piece.coordinates.z - 2
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.z + 2 < 5) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.z + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y,
-        coordinates.z + 2
+        piece.coordinates.x - 1,
+        piece.coordinates.y,
+        piece.coordinates.z + 2
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.z - 2 > -1) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.z - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y,
-        coordinates.z - 2
+        piece.coordinates.x - 1,
+        piece.coordinates.y,
+        piece.coordinates.z - 2
       );
       counter += 1;
     }
     // y-2 and z-1 axis movements
-    if (coordinates.y + 2 < 5 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.y + 2 < 5 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 2,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y + 2,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.y + 2 < 5 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.y + 2 < 5 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 2,
-        coordinates.z - 1
+        piece.coordinates.x,
+        piece.coordinates.y + 2,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
-    if (coordinates.y - 2 > -1 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.y - 2 > -1 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 2,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y - 2,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.y - 2 > -1 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.y - 2 > -1 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 2,
-        coordinates.z - 1
+        piece.coordinates.x,
+        piece.coordinates.y - 2,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     // y-1 and z-2 axis movements
-    if (coordinates.y + 1 < 5 && coordinates.z + 2 < 5) {
+    if (piece.coordinates.y + 1 < 5 && piece.coordinates.z + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z + 2
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z + 2
       );
       counter += 1;
     }
-    if (coordinates.y + 1 < 5 && coordinates.z - 2 > -1) {
+    if (piece.coordinates.y + 1 < 5 && piece.coordinates.z - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z - 2
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z - 2
       );
       counter += 1;
     }
-    if (coordinates.y - 1 > -1 && coordinates.z + 2 < 5) {
+    if (piece.coordinates.y - 1 > -1 && piece.coordinates.z + 2 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z + 2
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z + 2
       );
       counter += 1;
     }
-    if (coordinates.y - 1 > -1 && coordinates.z - 2 > -1) {
+    if (piece.coordinates.y - 1 > -1 && piece.coordinates.z - 2 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z - 2
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z - 2
       );
       counter += 1;
     }
-  } else if (type === "Unicorn") {
+  } else if (piece.type === "Unicorn") {
     // x-y-z axis movements
     let counter = 0;
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y + i < 5 &&
-        coordinates.z + i < 5
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y + i < 5 &&
-        coordinates.z - i > -1
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y - i > -1 &&
-        coordinates.z + i < 5
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y + i < 5 &&
-        coordinates.z + i < 5
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y - i > -1 &&
-        coordinates.z - i > -1
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y + i < 5 &&
-        coordinates.z - i > -1
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y - i > -1 &&
-        coordinates.z + i < 5
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y - i > -1 &&
-        coordinates.z - i > -1
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
-  } else if (type === "Queen") {
+  } else if (piece.type === "Queen") {
     let counter = 0;
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5) {
+      if (piece.coordinates.x + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1) {
+      if (piece.coordinates.x - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5) {
+      if (piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1) {
+      if (piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.z + i < 5) {
+      if (piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
 
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.z - i > -1) {
+      if (piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     // x and y axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.y + i < 5) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.y - i > -1) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.y + i < 5) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.y + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.y - i > -1) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.y - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z
         );
         counter += 1;
       }
     }
     // x and z axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.z + i < 5) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x + i < 5 && coordinates.z - i > -1) {
+      if (piece.coordinates.x + i < 5 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.z + i < 5) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z + i
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.x - i > -1 && coordinates.z - i > -1) {
+      if (piece.coordinates.x - i > -1 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     // y and z axis movements
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5 && coordinates.z + i < 5) {
+      if (piece.coordinates.y + i < 5 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y + i < 5 && coordinates.z - i > -1) {
+      if (piece.coordinates.y + i < 5 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1 && coordinates.z + i < 5) {
+      if (piece.coordinates.y - i > -1 && piece.coordinates.z + i < 5) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
-      if (coordinates.y - i > -1 && coordinates.z - i > -1) {
+      if (piece.coordinates.y - i > -1 && piece.coordinates.z - i > -1) {
         movesList[counter] = new Coordinates(
-          coordinates.x,
-          coordinates.y - i,
-          coordinates.z - i
-        );
-        counter += 1;
-      }
-    }
-    for (let i = 1; i < 5; i += 1) {
-      if (
-        coordinates.x + i < 5 &&
-        coordinates.y + i < 5 &&
-        coordinates.z + i < 5
-      ) {
-        movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y + i < 5 &&
-        coordinates.z - i > -1
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y - i > -1 &&
-        coordinates.z + i < 5
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y + i < 5 &&
-        coordinates.z + i < 5
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z + i
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x + i < 5 &&
-        coordinates.y - i > -1 &&
-        coordinates.z - i > -1
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x + i,
-          coordinates.y - i,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y + i < 5 &&
-        coordinates.z - i > -1
+        piece.coordinates.x + i < 5 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y + i,
-          coordinates.z - i
+          piece.coordinates.x + i,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y - i > -1 &&
-        coordinates.z + i < 5
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y + i < 5 &&
+        piece.coordinates.z - i > -1
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z + i
+          piece.coordinates.x - i,
+          piece.coordinates.y + i,
+          piece.coordinates.z - i
         );
         counter += 1;
       }
     }
     for (let i = 1; i < 5; i += 1) {
       if (
-        coordinates.x - i > -1 &&
-        coordinates.y - i > -1 &&
-        coordinates.z - i > -1
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z + i < 5
       ) {
         movesList[counter] = new Coordinates(
-          coordinates.x - i,
-          coordinates.y - i,
-          coordinates.z - i
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z + i
         );
         counter += 1;
       }
     }
-  } else if (type === "King") {
+    for (let i = 1; i < 5; i += 1) {
+      if (
+        piece.coordinates.x - i > -1 &&
+        piece.coordinates.y - i > -1 &&
+        piece.coordinates.z - i > -1
+      ) {
+        movesList[counter] = new Coordinates(
+          piece.coordinates.x - i,
+          piece.coordinates.y - i,
+          piece.coordinates.z - i
+        );
+        counter += 1;
+      }
+    }
+  } else if (piece.type === "King") {
     let counter = 0;
-    if (coordinates.x + 1 < 5) {
+    if (piece.coordinates.x + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y,
-        coordinates.z
+        piece.coordinates.x + 1,
+        piece.coordinates.y,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1) {
+    if (piece.coordinates.x - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y,
-        coordinates.z
+        piece.coordinates.x - 1,
+        piece.coordinates.y,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.y + 1 < 5) {
+    if (piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.y - 1 > -1) {
+    if (piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.z + 1 < 5) {
+    if (piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
 
-    if (coordinates.z - 1 > -1) {
+    if (piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     // x and y axis movements
-    if (coordinates.x + 1 < 5 && coordinates.y + 1 < 5) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x + 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x + 1 < 5 && coordinates.y - 1 > -1) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x + 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.y + 1 < 5) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.y + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y + 1,
-        coordinates.z
+        piece.coordinates.x - 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.y - 1 > -1) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.y - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y - 1,
-        coordinates.z
+        piece.coordinates.x - 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z
       );
       counter += 1;
     }
     // x and z axis movements
-    if (coordinates.x + 1 < 5 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.x + 1 < 5 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.x + 1 < 5 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y,
-        coordinates.z + 1
+        piece.coordinates.x - 1,
+        piece.coordinates.y,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.x - 1 > -1 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.x - 1 > -1 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y,
-        coordinates.z - 1
+        piece.coordinates.x - 1,
+        piece.coordinates.y,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     // y and z axis movements
-    if (coordinates.y + 1 < 5 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.y + 1 < 5 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.y + 1 < 5 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.y + 1 < 5 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y + 1,
-        coordinates.z - 1
+        piece.coordinates.x,
+        piece.coordinates.y + 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
-    if (coordinates.y - 1 > -1 && coordinates.z + 1 < 5) {
+    if (piece.coordinates.y - 1 > -1 && piece.coordinates.z + 1 < 5) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
-    if (coordinates.y - 1 > -1 && coordinates.z - 1 > -1) {
+    if (piece.coordinates.y - 1 > -1 && piece.coordinates.z - 1 > -1) {
       movesList[counter] = new Coordinates(
-        coordinates.x,
-        coordinates.y - 1,
-        coordinates.z - 1
-      );
-      counter += 1;
-    }
-    if (
-      coordinates.x + 1 < 5 &&
-      coordinates.y + 1 < 5 &&
-      coordinates.z + 1 < 5
-    ) {
-      movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y + 1,
-        coordinates.z + 1
+        piece.coordinates.x,
+        piece.coordinates.y - 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     if (
-      coordinates.x + 1 < 5 &&
-      coordinates.y + 1 < 5 &&
-      coordinates.z - 1 > -1
+      piece.coordinates.x + 1 < 5 &&
+      piece.coordinates.y + 1 < 5 &&
+      piece.coordinates.z + 1 < 5
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y + 1,
-        coordinates.z - 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
     if (
-      coordinates.x + 1 < 5 &&
-      coordinates.y - 1 > -1 &&
-      coordinates.z + 1 < 5
+      piece.coordinates.x + 1 < 5 &&
+      piece.coordinates.y + 1 < 5 &&
+      piece.coordinates.z - 1 > -1
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y - 1,
-        coordinates.z + 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     if (
-      coordinates.x - 1 > -1 &&
-      coordinates.y + 1 < 5 &&
-      coordinates.z + 1 < 5
+      piece.coordinates.x + 1 < 5 &&
+      piece.coordinates.y - 1 > -1 &&
+      piece.coordinates.z + 1 < 5
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y + 1,
-        coordinates.z + 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
     if (
-      coordinates.x + 1 < 5 &&
-      coordinates.y - 1 > -1 &&
-      coordinates.z - 1 > -1
+      piece.coordinates.x - 1 > -1 &&
+      piece.coordinates.y + 1 < 5 &&
+      piece.coordinates.z + 1 < 5
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x + 1,
-        coordinates.y - 1,
-        coordinates.z - 1
+        piece.coordinates.x - 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z + 1
       );
       counter += 1;
     }
     if (
-      coordinates.x - 1 > -1 &&
-      coordinates.y + 1 < 5 &&
-      coordinates.z - 1 > -1
+      piece.coordinates.x + 1 < 5 &&
+      piece.coordinates.y - 1 > -1 &&
+      piece.coordinates.z - 1 > -1
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y + 1,
-        coordinates.z - 1
+        piece.coordinates.x + 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     if (
-      coordinates.x - 1 > -1 &&
-      coordinates.y - 1 > -1 &&
-      coordinates.z + 1 < 5
+      piece.coordinates.x - 1 > -1 &&
+      piece.coordinates.y + 1 < 5 &&
+      piece.coordinates.z - 1 > -1
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y - 1,
-        coordinates.z + 1
+        piece.coordinates.x - 1,
+        piece.coordinates.y + 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
     if (
-      coordinates.x - 1 > -1 &&
-      coordinates.y - 1 > -1 &&
-      coordinates.z - 1 > -1
+      piece.coordinates.x - 1 > -1 &&
+      piece.coordinates.y - 1 > -1 &&
+      piece.coordinates.z + 1 < 5
     ) {
       movesList[counter] = new Coordinates(
-        coordinates.x - 1,
-        coordinates.y - 1,
-        coordinates.z - 1
+        piece.coordinates.x - 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z + 1
+      );
+      counter += 1;
+    }
+    if (
+      piece.coordinates.x - 1 > -1 &&
+      piece.coordinates.y - 1 > -1 &&
+      piece.coordinates.z - 1 > -1
+    ) {
+      movesList[counter] = new Coordinates(
+        piece.coordinates.x - 1,
+        piece.coordinates.y - 1,
+        piece.coordinates.z - 1
       );
       counter += 1;
     }
@@ -1153,208 +1153,216 @@ export const allMoves = async (type, coordinates) => {
 };
 
 // calculate blocked cubes
-export const legalMoves = async (gameState, type, coordinates, color) => {
-  const movesList = await allMoves(type, coordinates);
+export const legalMoves = async (gameState, piece) => {
+  const movesList = await allMoves(piece);
   const illegalMovesList = [];
   let vectorX;
   let vectorY;
   let vectorZ;
   let j = 0;
-  if (type === "BlackPawn") {
+  if (piece.type === "BlackPawn") {
     for (const i in gameState) {
       for (const move in movesList) {
         if (
-          (coordinates.y - 1 === gameState[i].coordinates.y &&
-            coordinates.y - 1 === movesList[move].y &&
-            coordinates.z === gameState[i].coordinates.z &&
-            coordinates.z === movesList[move].z) ||
-          (coordinates.y === gameState[i].coordinates.y &&
-            coordinates.y === movesList[move].y &&
-            coordinates.z - 1 === gameState[i].coordinates.z &&
-            coordinates.z - 1 === movesList[move].z)
+          (piece.coordinates.x === gameState[i].coordinates.x &&
+            piece.coordinates.x === movesList[move].x &&
+            piece.coordinates.y - 1 === gameState[i].coordinates.y &&
+            piece.coordinates.y - 1 === movesList[move].y &&
+            piece.coordinates.z === gameState[i].coordinates.z &&
+            piece.coordinates.z === movesList[move].z) ||
+          (piece.coordinates.x === gameState[i].coordinates.x &&
+            piece.coordinates.x === movesList[move].x &&
+            piece.coordinates.y === gameState[i].coordinates.y &&
+            piece.coordinates.y === movesList[move].y &&
+            piece.coordinates.z - 1 === gameState[i].coordinates.z &&
+            piece.coordinates.z - 1 === movesList[move].z)
         )
           illegalMovesList.push(movesList[move]);
       }
       if (
-        coordinates.x - 1 > -1 &&
-        coordinates.y - 1 > -1 &&
-        gameState[i].coordinates.x === coordinates.x - 1 &&
-        gameState[i].coordinates.y === coordinates.y - 1 &&
-        gameState[i].coordinates.z === coordinates.z &&
-        gameState[i].color !== color
+        piece.coordinates.x - 1 > -1 &&
+        piece.coordinates.y - 1 > -1 &&
+        gameState[i].coordinates.x === piece.coordinates.x - 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y - 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x - 1,
-            coordinates.y - 1,
-            coordinates.z,
+            piece.coordinates.x - 1,
+            piece.coordinates.y - 1,
+            piece.coordinates.z,
             "Capture"
           )
         );
       } else if (
-        coordinates.x + 1 < 5 &&
-        coordinates.y - 1 > -1 &&
-        gameState[i].coordinates.x === coordinates.x + 1 &&
-        gameState[i].coordinates.y === coordinates.y - 1 &&
-        gameState[i].coordinates.z === coordinates.z &&
-        gameState[i].color !== color
+        piece.coordinates.x + 1 < 5 &&
+        piece.coordinates.y - 1 > -1 &&
+        gameState[i].coordinates.x === piece.coordinates.x + 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y - 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x + 1,
-            coordinates.y - 1,
-            coordinates.z,
+            piece.coordinates.x + 1,
+            piece.coordinates.y - 1,
+            piece.coordinates.z,
             "Capture"
           )
         );
       } else if (
-        coordinates.y - 1 > -1 &&
-        coordinates.z - 1 > -1 &&
-        gameState[i].coordinates.x === coordinates.x &&
-        gameState[i].coordinates.y === coordinates.y - 1 &&
-        gameState[i].coordinates.z === coordinates.z - 1 &&
-        gameState[i].color !== color
+        piece.coordinates.y - 1 > -1 &&
+        piece.coordinates.z - 1 > -1 &&
+        gameState[i].coordinates.x === piece.coordinates.x &&
+        gameState[i].coordinates.y === piece.coordinates.y - 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z - 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x,
-            coordinates.y - 1,
-            coordinates.z - 1,
+            piece.coordinates.x,
+            piece.coordinates.y - 1,
+            piece.coordinates.z - 1,
             "Capture"
           )
         );
       } else if (
-        coordinates.x + 1 < 5 &&
-        coordinates.z - 1 > -1 &&
-        gameState[i].coordinates.x === coordinates.x + 1 &&
-        gameState[i].coordinates.y === coordinates.y &&
-        gameState[i].coordinates.z === coordinates.z - 1 &&
-        gameState[i].color !== color
+        piece.coordinates.x + 1 < 5 &&
+        piece.coordinates.z - 1 > -1 &&
+        gameState[i].coordinates.x === piece.coordinates.x + 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y &&
+        gameState[i].coordinates.z === piece.coordinates.z - 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x + 1,
-            coordinates.y,
-            coordinates.z - 1,
+            piece.coordinates.x + 1,
+            piece.coordinates.y,
+            piece.coordinates.z - 1,
             "Capture"
           )
         );
       } else if (
-        coordinates.x - 1 > -1 &&
-        coordinates.z - 1 > -1 &&
-        gameState[i].coordinates.x === coordinates.x - 1 &&
-        gameState[i].coordinates.y === coordinates.y &&
-        gameState[i].coordinates.z === coordinates.z - 1 &&
-        gameState[i].color !== color
+        piece.coordinates.x - 1 > -1 &&
+        piece.coordinates.z - 1 > -1 &&
+        gameState[i].coordinates.x === piece.coordinates.x - 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y &&
+        gameState[i].coordinates.z === piece.coordinates.z - 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x - 1,
-            coordinates.y,
-            coordinates.z - 1,
+            piece.coordinates.x - 1,
+            piece.coordinates.y,
+            piece.coordinates.z - 1,
             "Capture"
           )
         );
       }
     }
-  } else if (type === "WhitePawn") {
+  } else if (piece.type === "WhitePawn") {
     for (const i in gameState) {
       for (const move in movesList) {
         if (
-          (coordinates.y + 1 === gameState[i].coordinates.y &&
-            coordinates.y + 1 === movesList[move].y &&
-            coordinates.z === gameState[i].coordinates.z &&
-            coordinates.z === movesList[move].z) ||
-          (coordinates.y === gameState[i].coordinates.y &&
-            coordinates.y === movesList[move].y &&
-            coordinates.z + 1 === gameState[i].coordinates.z &&
-            coordinates.z + 1 === movesList[move].z)
+          (piece.coordinates.x === gameState[i].coordinates.x &&
+            piece.coordinates.x === movesList[move].x &&
+            piece.coordinates.y + 1 === gameState[i].coordinates.y &&
+            piece.coordinates.y + 1 === movesList[move].y &&
+            piece.coordinates.z === gameState[i].coordinates.z &&
+            piece.coordinates.z === movesList[move].z) ||
+          (piece.coordinates.x === gameState[i].coordinates.x &&
+            piece.coordinates.x === movesList[move].x &&
+            piece.coordinates.y === gameState[i].coordinates.y &&
+            piece.coordinates.y === movesList[move].y &&
+            piece.coordinates.z + 1 === gameState[i].coordinates.z &&
+            piece.coordinates.z + 1 === movesList[move].z)
         )
           illegalMovesList.push(movesList[move]);
       }
       if (
-        coordinates.x - 1 > -1 &&
-        coordinates.y + 1 < 5 &&
-        gameState[i].coordinates.x === coordinates.x - 1 &&
-        gameState[i].coordinates.y === coordinates.y + 1 &&
-        gameState[i].coordinates.z === coordinates.z &&
-        gameState[i].color !== color
+        piece.coordinates.x - 1 > -1 &&
+        piece.coordinates.y + 1 < 5 &&
+        gameState[i].coordinates.x === piece.coordinates.x - 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y + 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x - 1,
-            coordinates.y + 1,
-            coordinates.z,
+            piece.coordinates.x - 1,
+            piece.coordinates.y + 1,
+            piece.coordinates.z,
             "Capture"
           )
         );
       } else if (
-        coordinates.x + 1 < 5 &&
-        coordinates.y + 1 < 5 &&
-        gameState[i].coordinates.x === coordinates.x + 1 &&
-        gameState[i].coordinates.y === coordinates.y + 1 &&
-        gameState[i].coordinates.z === coordinates.z &&
-        gameState[i].color !== color
+        piece.coordinates.x + 1 < 5 &&
+        piece.coordinates.y + 1 < 5 &&
+        gameState[i].coordinates.x === piece.coordinates.x + 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y + 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x + 1,
-            coordinates.y + 1,
-            coordinates.z,
+            piece.coordinates.x + 1,
+            piece.coordinates.y + 1,
+            piece.coordinates.z,
             "Capture"
           )
         );
       } else if (
-        coordinates.y + 1 < 5 &&
-        coordinates.z + 1 < 5 &&
-        gameState[i].coordinates.x === coordinates.x &&
-        gameState[i].coordinates.y === coordinates.y + 1 &&
-        gameState[i].coordinates.z === coordinates.z + 1 &&
-        gameState[i].color !== color
+        piece.coordinates.y + 1 < 5 &&
+        piece.coordinates.z + 1 < 5 &&
+        gameState[i].coordinates.x === piece.coordinates.x &&
+        gameState[i].coordinates.y === piece.coordinates.y + 1 &&
+        gameState[i].coordinates.z === piece.coordinates.z + 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x,
-            coordinates.y + 1,
-            coordinates.z + 1,
+            piece.coordinates.x,
+            piece.coordinates.y + 1,
+            piece.coordinates.z + 1,
             "Capture"
           )
         );
       } else if (
-        coordinates.x + 1 < 5 &&
-        coordinates.z + 1 < 5 &&
-        gameState[i].coordinates.x === coordinates.x + 1 &&
-        gameState[i].coordinates.y === coordinates.y &&
-        gameState[i].coordinates.z === coordinates.z + 1 &&
-        gameState[i].color !== color
+        piece.coordinates.x + 1 < 5 &&
+        piece.coordinates.z + 1 < 5 &&
+        gameState[i].coordinates.x === piece.coordinates.x + 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y &&
+        gameState[i].coordinates.z === piece.coordinates.z + 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x + 1,
-            coordinates.y,
-            coordinates.z + 1,
+            piece.coordinates.x + 1,
+            piece.coordinates.y,
+            piece.coordinates.z + 1,
             "Capture"
           )
         );
       } else if (
-        coordinates.x - 1 > -1 &&
-        coordinates.z + 1 < 5 &&
-        gameState[i].coordinates.x === coordinates.x - 1 &&
-        gameState[i].coordinates.y === coordinates.y &&
-        gameState[i].coordinates.z === coordinates.z + 1 &&
-        gameState[i].color !== color
+        piece.coordinates.x - 1 > -1 &&
+        piece.coordinates.z + 1 < 5 &&
+        gameState[i].coordinates.x === piece.coordinates.x - 1 &&
+        gameState[i].coordinates.y === piece.coordinates.y &&
+        gameState[i].coordinates.z === piece.coordinates.z + 1 &&
+        gameState[i].color !== piece.color
       ) {
         movesList.push(
           new Coordinates(
-            coordinates.x - 1,
-            coordinates.y,
-            coordinates.z + 1,
+            piece.coordinates.x - 1,
+            piece.coordinates.y,
+            piece.coordinates.z + 1,
             "Capture"
           )
         );
       }
     }
-  } else if (type === "Knight") {
+  } else if (piece.type === "Knight") {
     while (movesList[j]) {
       // eslint-disable-next-line guard-for-in
       for (const i in gameState) {
@@ -1363,7 +1371,7 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
           gameState[i].coordinates.y === movesList[j].y &&
           gameState[i].coordinates.z === movesList[j].z
         ) {
-          if (gameState[i].color === color) {
+          if (gameState[i].color === piece.color) {
             const index = illegalMovesList.findIndex(
               // eslint-disable-next-line no-loop-func
               (move) => move === movesList[j]
@@ -1385,11 +1393,11 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
           gameState[i].coordinates.x === movesList[j].x &&
           gameState[i].coordinates.y === movesList[j].y &&
           gameState[i].coordinates.z === movesList[j].z &&
-          gameState[i].color === color
+          gameState[i].color === piece.color
         ) {
-          vectorX = movesList[j].x - coordinates.x;
-          vectorY = movesList[j].y - coordinates.y;
-          vectorZ = movesList[j].z - coordinates.z;
+          vectorX = movesList[j].x - piece.coordinates.x;
+          vectorY = movesList[j].y - piece.coordinates.y;
+          vectorZ = movesList[j].z - piece.coordinates.z;
 
           if (vectorX !== 0) vectorX /= Math.abs(vectorX);
           if (vectorY !== 0) vectorY /= Math.abs(vectorY);
@@ -1416,12 +1424,12 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
           gameState[i].coordinates.x === movesList[j].x &&
           gameState[i].coordinates.y === movesList[j].y &&
           gameState[i].coordinates.z === movesList[j].z &&
-          gameState[i].color !== color
+          gameState[i].color !== piece.color
         ) {
           movesList[j].type = "Capture";
-          vectorX = movesList[j].x - coordinates.x;
-          vectorY = movesList[j].y - coordinates.y;
-          vectorZ = movesList[j].z - coordinates.z;
+          vectorX = movesList[j].x - piece.coordinates.x;
+          vectorY = movesList[j].y - piece.coordinates.y;
+          vectorZ = movesList[j].z - piece.coordinates.z;
 
           if (vectorX !== 0) vectorX /= Math.abs(vectorX);
           if (vectorY !== 0) vectorY /= Math.abs(vectorY);
@@ -1452,50 +1460,106 @@ export const legalMoves = async (gameState, type, coordinates, color) => {
       j += 1;
     }
   }
-
   return onlyInFirst(movesList, illegalMovesList);
 };
 
-export const isCheck = async (gameState, coordinates, color) => {
+export const isCheck = async (gameState, king) => {
   let isInCheck = false;
   for (const i in gameState) {
-    if (gameState[i].color !== color) {
-      const movesList = await legalMoves(
-        gameState,
-        gameState[i].type,
-        gameState[i].coordinates,
-        gameState[i].color
-      );
+    if (gameState[i].color !== king.color) {
+      const movesList = await legalMoves(gameState, gameState[i]);
       for (const j in movesList) {
         if (
-          movesList[j].x === coordinates.x &&
-          movesList[j].y === coordinates.y &&
-          movesList[j].z === coordinates.z
+          movesList[j].x === king.coordinates.x &&
+          movesList[j].y === king.coordinates.y &&
+          movesList[j].z === king.coordinates.z
         ) {
           isInCheck = true;
         }
       }
     }
   }
-  console.log(isInCheck);
   return isInCheck;
 };
 
 // this function returns
-export const inCheckMoves = async (legalMovesList, gameState, coordinates) => {
+export const inCheckMoves = async (gameState, piece) => {
+  const legalMovesList = await legalMoves(gameState, piece);
   const resultList = [];
+
   for (const i in legalMovesList) {
+    let king;
+    if (piece.color === "Black") {
+      king = (await afterMove(piece, legalMovesList[i], gameState)).bk;
+    } else {
+      king = (await afterMove(piece, legalMovesList[i], gameState)).wk;
+    }
     if (
       (await isCheck(
-        await afterMove(coordinates, legalMovesList[i], gameState),
-        (await afterMove(coordinates, legalMovesList[i], gameState)).wk
-          .coordinates,
-        (await afterMove(coordinates, legalMovesList[i], gameState)).wk.color
+        await afterMove(piece, legalMovesList[i], gameState),
+        king
       )) === false
     ) {
-      console.log(legalMovesList);
       resultList.push(legalMovesList[i]);
     }
   }
   return resultList;
+};
+
+export const finalMoves = async (gameState, piece) => {
+  const legalMovesList = await legalMoves(gameState, piece);
+  let resultList = [];
+  let king;
+  if (piece.color === "Black") {
+    king = gameState.bk;
+  } else {
+    king = gameState.wk;
+  }
+  if ((await isCheck(gameState, king)) === true) {
+    resultList = inCheckMoves(gameState, piece);
+  } else {
+    for (const i in legalMovesList) {
+      if (piece.color === "Black") {
+        king = (await afterMove(piece, legalMovesList[i], gameState)).bk;
+      } else {
+        king = (await afterMove(piece, legalMovesList[i], gameState)).wk;
+      }
+      if (
+        (await isCheck(
+          await afterMove(piece, legalMovesList[i], gameState),
+          king
+        )) === false
+      ) {
+        resultList.push(legalMovesList[i]);
+      }
+    }
+  }
+  return resultList;
+};
+export const checkMate = async (gameState) => {
+  let isCheckMate = false;
+  if (isCheck(gameState, gameState.bk)) {
+    console.log("geldim");
+    isCheckMate = "Black Checkmated";
+    for (const i in gameState) {
+      if (
+        gameState[i].color === "Black" &&
+        (await finalMoves(gameState, gameState[i])).length !== 0
+      ) {
+        isCheckMate = false;
+        console.log("geldim");
+      }
+    }
+  } else if (isCheck(gameState, gameState.wk)) {
+    isCheckMate = "White Checkmated";
+    for (const i in gameState) {
+      if (
+        gameState[i].color === "White" &&
+        (await finalMoves(gameState, gameState[i])).length !== 0
+      ) {
+        isCheckMate = false;
+      }
+    }
+  }
+  return isCheckMate;
 };

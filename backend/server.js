@@ -40,9 +40,9 @@ io.on("connection", (socket) => {
   clients += 1;
   socket.join("room1");
   // Send this event to everyone in the room.
-  socket.on("clientEvent", async (data) => {
+  socket.on("sendMove", async (data) => {
+    io.to("room1").emit("getMove", data);
     console.log(data);
-    io.to("room1").emit("NewState", data);
   });
   socket.on("userconnected", (data) => {
     console.log(
@@ -53,12 +53,12 @@ io.on("connection", (socket) => {
   });
 
   // Whenever someone disconnects this piece of code executed
-  socket.on("disconnect", function () {
+  socket.on("disconnect", () => {
     clients -= 1;
     console.log("A user disconnected");
   });
 });
 
-http.listen(5000, function () {
+http.listen(5000, () => {
   console.log("listening on *:3000");
 });
