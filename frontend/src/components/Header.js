@@ -1,15 +1,7 @@
 import { getUserInfo } from "../localStorage";
 
 const Header = {
-  after_render: () => {
-    const { isAdmin } = getUserInfo();
-    if (isAdmin)
-      document
-        .getElementById("go-to-create-button")
-        .addEventListener("click", async () => {
-          document.location.hash = "/create";
-        });
-  },
+  after_render: () => {},
   render: () => {
     const { name } = getUserInfo();
     return `

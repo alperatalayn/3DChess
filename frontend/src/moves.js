@@ -23,14 +23,14 @@ function onlyInFirst(first, second) {
 }
 const deletePieceFromState = (pieceInput, GameState) => {
   for (const piece in GameState) {
-    if (GameState[piece] === pieceInput) {
+    if (GameState[piece] === pieceInput && GameState[piece].type !== "King") {
       // eslint-disable-next-line no-param-reassign
       delete GameState[piece];
     }
   }
   return "Not Found";
 };
-function afterMove(coordinates, move, gameState) {
+export const afterMove = async (coordinates, move, gameState) => {
   // eslint-disable-next-line prefer-object-spread
   const newState = JSON.parse(JSON.stringify(gameState));
   const piece = getPieceFromState(newState, coordinates);
@@ -49,7 +49,7 @@ function afterMove(coordinates, move, gameState) {
   piece.coordinates.y = move.y;
   piece.coordinates.z = move.z;
   return newState;
-}
+};
 export const getPieceFromState = (GameState, coordinates) => {
   for (const piece in GameState) {
     if (
@@ -59,7 +59,7 @@ export const getPieceFromState = (GameState, coordinates) => {
     )
       return GameState[piece];
   }
-  return "Not Found";
+  return null;
 };
 
 export const allMoves = async (type, coordinates) => {
@@ -1487,9 +1487,10 @@ export const inCheckMoves = async (legalMovesList, gameState, coordinates) => {
   for (const i in legalMovesList) {
     if (
       (await isCheck(
-        afterMove(coordinates, legalMovesList[i], gameState),
-        gameState.wk.coordinates,
-        gameState.wk.color
+        await afterMove(coordinates, legalMovesList[i], gameState),
+        (await afterMove(coordinates, legalMovesList[i], gameState)).wk
+          .coordinates,
+        (await afterMove(coordinates, legalMovesList[i], gameState)).wk.color
       )) === false
     ) {
       console.log(legalMovesList);

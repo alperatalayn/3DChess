@@ -16,6 +16,13 @@ const ProfileScreen = {
       document.location.hash = "/";
     }
     return `
+    
+    <li>
+    <button class="primary" id="update-button"> Update Profile </button>
+</li>
+<li>
+    <button type="button" class="primary" id="signout-button" class="fw">Sign Out </button>
+</li>
     `;
   },
 };

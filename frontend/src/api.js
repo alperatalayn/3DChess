@@ -3,81 +3,6 @@ import axios from "axios";
 import { apiUrl } from "./config";
 import { getUserInfo } from "./localStorage";
 
-export const getMemory = async (id) => {
-  try {
-    const response = await axios({
-      url: `${apiUrl}/api/memories/${id}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (response.statusText !== "OK") {
-      throw new Error(response.data.message);
-    }
-    return response.data;
-  } catch (err) {
-    console.log(err);
-    return { error: err.response.data.message || err.message };
-  }
-};
-export const getMemories = async () => {
-  try {
-    const response = await axios({
-      url: `${apiUrl}/api/memories/`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (response.statusText !== "OK") {
-      throw new Error(response.data.message);
-    }
-    return response.data;
-  } catch (err) {
-    console.log(err);
-    return { error: err.response.data.message || err.message };
-  }
-};
-export const getMyMemories = async () => {
-  try {
-    const { token } = getUserInfo();
-    const response = await axios({
-      url: `${apiUrl}/api/memories/mymemories`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (response.statusText !== "OK") {
-      throw new Error(response.data.message);
-    }
-    return response.data;
-  } catch (err) {
-    console.log(err);
-    return { error: err.response.data.message || err.message };
-  }
-};
-export const deleteMemory = async () => {
-  try {
-    const { token } = getUserInfo();
-    const response = await axios({
-      url: `${apiUrl}/api/memories/mine`,
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (response.statusText !== "OK") {
-      throw new Error(response.data.message);
-    }
-    return response.data;
-  } catch (err) {
-    return { error: err.response.data.message || err.message };
-  }
-};
 export const getUserById = async (id) => {
   try {
     const response = await axios({
@@ -88,31 +13,6 @@ export const getUserById = async (id) => {
       },
     });
     if (response.statusText !== "OK") {
-      throw new Error(response.data.message);
-    }
-    return response.data;
-  } catch (err) {
-    console.log(err);
-    return { error: err.response.data.message || err.message };
-  }
-};
-export const createMemory = async (title, content, image) => {
-  try {
-    const { token } = getUserInfo();
-    const response = await axios({
-      url: `${apiUrl}/api/memories`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      data: {
-        title,
-        content,
-        image,
-      },
-    });
-    if (response.statusText !== "Created") {
       throw new Error(response.data.message);
     }
     return response.data;
@@ -192,3 +92,4 @@ export const updateUser = async ({ name, email, password }) => {
     return { error: err.response.data.message || err.message };
   }
 };
+export const pushMove = () => {};

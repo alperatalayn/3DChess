@@ -33,7 +33,7 @@ export const setGameState = (gamestate) => {
       gamestate,
     })
   );
-  console.log(getGameState());
+  console.log("setted");
 };
 export const getGameState = () => {
   if (localStorage.getItem("gameState"))
