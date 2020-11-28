@@ -1536,10 +1536,11 @@ export const finalMoves = async (gameState, piece) => {
   }
   return resultList;
 };
+
+// returns false if there is no checkmate otherwise returns checkmated side
 export const checkMate = async (gameState) => {
   let isCheckMate = false;
-  if (isCheck(gameState, gameState.bk)) {
-    console.log("geldim");
+  if ((await isCheck(gameState, gameState.bk)) === true) {
     isCheckMate = "Black Checkmated";
     for (const i in gameState) {
       if (
@@ -1547,19 +1548,21 @@ export const checkMate = async (gameState) => {
         (await finalMoves(gameState, gameState[i])).length !== 0
       ) {
         isCheckMate = false;
-        console.log("geldim");
       }
     }
-  } else if (isCheck(gameState, gameState.wk)) {
+  } else if ((await isCheck(gameState, gameState.wk)) === true) {
+    console.log("geldim");
     isCheckMate = "White Checkmated";
     for (const i in gameState) {
       if (
         gameState[i].color === "White" &&
         (await finalMoves(gameState, gameState[i])).length !== 0
       ) {
+        console.log("geldim");
         isCheckMate = false;
       }
     }
   }
+  console.log(await isCheck(gameState, gameState.wk));
   return isCheckMate;
 };

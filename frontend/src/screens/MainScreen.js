@@ -12,9 +12,9 @@ import { checkMate, finalMoves, getPieceFromState } from "../moves";
 const socket = io("http://localhost:5000");
 
 export const connect = async () => {
-  const user = getUserInfo().name;
+  const user = getUserInfo();
   socket.on("connection", () => {});
-  socket.emit("userconnected", { name: user.name });
+  socket.emit("userconnected", user);
 };
 export const sendMoveToServer = async (movedPiece, pickInfo) => {
   socket.emit("sendMove", {
@@ -240,7 +240,7 @@ const createScene = async () => {
     scene.getMeshByName(data.piece).position.z = data.position._z;
     await setGameState(GameState);
     await setBoardDefault();
-    checkMate(GameState);
+    console.log(await checkMate(GameState));
   });
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
   camera.setTarget(ThreeDBoard[2][2][2]);

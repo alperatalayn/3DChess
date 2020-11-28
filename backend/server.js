@@ -1,3 +1,5 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-param-reassign */
 import bodyParser from "body-parser";
 import express from "express";
 import cors from "cors";
@@ -35,27 +37,45 @@ const io = require("socket.io")(http, {
 });
 
 // Whenever someone connects this gets executed
-let clients = 0;
+const activeUsers = {};
+const activeSockets = {};
 io.on("connection", (socket) => {
-  clients += 1;
-  socket.join("room1");
-  // Send this event to everyone in the room.
-  socket.on("sendMove", async (data) => {
-    io.to("room1").emit("getMove", data);
-    console.log(data);
-  });
   socket.on("userconnected", (data) => {
-    console.log(
-      data.name || "user not found",
-      "connected total online:",
-      clients
-    );
+    const userDetails = data;
+    const username = data.name;
+    socket.user = username;
+    if (!activeSockets.hasOwnProperty(socket.id)) {
+      activeSockets[socket.id] = socket;
+    }
+    if (!activeUsers.hasOwnProperty(username)) {
+      activeUsers[username] = {
+        userDetails,
+        sockets: [socket.id],
+      };
+      console.log(data.name, "connected");
+    } else {
+      activeUsers[username].sockets.push(socket);
+      console.log(data.name, "started app at a new tab");
+    }
+  });
+  socket.on("sendMove", async (data) => {
+    io.emit("getMove", data);
+    console.log(data);
   });
 
   // Whenever someone disconnects this piece of code executed
   socket.on("disconnect", () => {
-    clients -= 1;
-    console.log("A user disconnected");
+    const socketId = socket.id;
+    const username = activeSockets[socketId].user;
+    const userSocketList = activeUsers[username].sockets;
+    userSocketList.splice(userSocketList.indexOf(socketId), 1);
+    delete activeSockets[socketId];
+    console.log(username, "closed a tab");
+    if (userSocketList.length === 0) {
+      // That means no socket for that user is active and user is now offline
+      console.log(username, "disconnected");
+      delete activeUsers[username];
+    }
   });
 });
 
