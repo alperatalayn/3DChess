@@ -6,26 +6,63 @@ import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import io from "socket.io-client";
 import { initialState } from "../config";
-import { getGameState, getUserInfo, setGameState } from "../localStorage";
+import {
+  getGameState,
+  getUserInfo,
+  setGameState,
+  setRoom,
+  getRoom,
+  setColor,
+  getColor,
+  setNextToMove,
+  getNextToMove,
+} from "../localStorage";
 import { checkMate, finalMoves, getPieceFromState } from "../moves";
-// import TwoDBoards from "../components/TwoDBoards";
-const socket = io("http://localhost:5000");
 
-export const connect = async () => {
-  const user = getUserInfo();
-  socket.on("connection", () => {});
-  socket.emit("userconnected", user);
+let turn = getNextToMove();
+let GameState = getGameState();
+const socket = io("http://localhost:5000");
+const pi = 3.1415;
+let pieceToMove = null;
+socket.on("game started", async (data) => {
+  turn = "White";
+  setNextToMove(turn);
+  setRoom(data.room);
+  setColor(data.color);
+  console.log(getRoom());
+  setGameState(initialState);
+  GameState = getGameState();
+  await animateScene();
+});
+socket.on("game ended", (data) => {
+  alert(`${data}game ended`);
+});
+const player = getColor();
+export const connect = () => {
+  const userInfo = getUserInfo();
+  io.connect({
+    reconnection: true,
+    reconnectionDelay: 500,
+    reconnectionAttempts: 10,
+  });
+  socket.emit("userconnected", { user: userInfo, room: getRoom() });
 };
-export const sendMoveToServer = async (movedPiece, pickInfo) => {
+
+export const sendMoveToServer = async (roomToSend, movedPiece, pickInfo) => {
+  let nextToMove;
+  if (turn === "White") {
+    nextToMove = "Black";
+  } else {
+    nextToMove = "White";
+  }
   socket.emit("sendMove", {
+    turn: nextToMove,
+    room: roomToSend,
     piece: movedPiece,
     position: pickInfo.pickedMesh.position,
   });
 };
-const deg = 1.5707;
-let pieceToMove = null;
-if (!getGameState()) setGameState(initialState);
-const GameState = getGameState();
+
 const getMoves = async (pickInfo) => {
   const movesList = await finalMoves(
     GameState,
@@ -37,6 +74,7 @@ const getMoves = async (pickInfo) => {
   );
   return movesList;
 };
+
 const deletePieceFromState = async (pieceInput, scene) => {
   scene
     .getMeshByName(getKeyByValue(GameState, pieceInput.coordinates))
@@ -44,7 +82,6 @@ const deletePieceFromState = async (pieceInput, scene) => {
   for (const piece in GameState) {
     if (GameState[piece] === pieceInput && GameState[piece].type !== "King") {
       delete GameState[piece];
-      await setGameState(GameState);
     }
   }
   return "Not Found";
@@ -58,36 +95,14 @@ const getKeyByValue = (object, coordinates) => {
   );
 };
 
-connect();
 const createScene = async () => {
   const canvas = document.getElementById("renderCanvas"); // Get the canvas element
   const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
   // eslint-disable-next-line no-unused-vars
   const scene = new BABYLON.Scene(engine);
-  const camera = new BABYLON.ArcRotateCamera(
-    "cam",
-    (deg * 3) / 3,
-    (deg * 3) / 2,
-    15,
-    new BABYLON.Vector3(0, 0, 0),
-    scene,
-    true
-  ); // new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
-  // This targets the camera to scene origin
-
-  // This attaches the camera to the canvas
-  camera.attachControl(canvas, true);
-  camera.mode = BABYLON.Camera.PERSPECTIVE_CAMERA;
-  camera.lowerAlphaLimit = (deg * 2) / 3;
-  camera.upperAlphaLimit = (deg * 4) / 3;
-
-  camera.lowerBetaLimit = deg;
-  camera.upperBetaLimit = deg * 2;
-  camera.lowerRadiusLimit = 12.5;
-  camera.upperRadiusLimit = 22.5;
   const light = new BABYLON.HemisphericLight(
     "light",
-    new BABYLON.Vector3(3, 3, 5)
+    new BABYLON.Vector3(-1, -1, 1)
   );
   light.intensity = 0.6;
   // eslint-disable-next-line no-unused-vars
@@ -131,6 +146,7 @@ const createScene = async () => {
           frontUVs: f,
           backUVs: b,
         });
+        ThreeDBoard[i][j][k].freezeWorldMatrix();
         ThreeDBoard[i][j][k].position = new BABYLON.Vector3(i, j, k * 2);
         if ((j + k + i) % 2 === 1) {
           ThreeDBoard[i][j][k].material = brownMaterial;
@@ -138,6 +154,44 @@ const createScene = async () => {
           ThreeDBoard[i][j][k].material = whiteMaterial;
         }
       }
+  const camera = new BABYLON.ArcRotateCamera(
+    "cam",
+    pi / 2,
+    2.8,
+    15,
+    ThreeDBoard[2][2][2],
+    scene,
+    true
+  );
+
+  camera.attachControl(canvas, true);
+  camera.mode = BABYLON.Camera.PERSPECTIVE_CAMERA;
+  camera.lowerAlphaLimit = pi / 3;
+  camera.upperAlphaLimit = (2 * pi) / 3;
+
+  camera.lowerBetaLimit = pi / 2;
+  camera.upperBetaLimit = pi;
+  camera.lowerRadiusLimit = 12.5;
+  camera.upperRadiusLimit = 22.5;
+
+  const camera1 = new BABYLON.ArcRotateCamera(
+    "cam",
+    pi / 2,
+    2.8,
+    15,
+    ThreeDBoard[2][2][2],
+    scene,
+    true
+  );
+  camera1.attachControl(canvas, true);
+  camera1.mode = BABYLON.Camera.PERSPECTIVE_CAMERA;
+  camera1.lowerAlphaLimit = pi + pi / 3;
+  camera1.upperAlphaLimit = pi + (2 * pi) / 3;
+
+  camera1.lowerBetaLimit = -pi / 2;
+  camera1.upperBetaLimit = 0;
+  camera1.lowerRadiusLimit = 12.5;
+  camera1.upperRadiusLimit = 22.5;
   for (const piece in GameState) {
     const p = BABYLON.SceneLoader.ImportMeshAsync(
       null,
@@ -150,7 +204,7 @@ const createScene = async () => {
       GameState[piece].coordinates.y,
       GameState[piece].coordinates.z * 2
     );
-    (await p).meshes[0].rotation = new BABYLON.Vector3(deg, 0, 0);
+    (await p).meshes[0].rotation = new BABYLON.Vector3(pi / 2, 0, 0);
     if (GameState[piece].color === "White")
       (await p).meshes[0].material = whiteMaterial;
     else if (GameState[piece].color === "Black")
@@ -205,17 +259,19 @@ const createScene = async () => {
       if (
         pickInfo.pickedMesh.type &&
         pieceToMove === null &&
+        pickInfo.pickedMesh.color === player &&
         pickInfo.pickedMesh.status === ""
       ) {
         const movesList = await getMoves(pickInfo);
         setBoard(movesList, pickInfo);
       } else if (
-        pickInfo.pickedMesh.status === "moveable" ||
-        pickInfo.pickedMesh.status === "can-capture"
+        (pickInfo.pickedMesh.status === "moveable" && turn === player) ||
+        (pickInfo.pickedMesh.status === "can-capture" && turn === player)
       ) {
         const movedPiece = pieceToMove.name;
-        // move(pickInfo);
-        sendMoveToServer(movedPiece, pickInfo);
+        const roomToSend = getRoom();
+        console.log(roomToSend);
+        await sendMoveToServer(roomToSend, movedPiece, pickInfo);
       } else {
         await setBoardDefault();
       }
@@ -238,12 +294,18 @@ const createScene = async () => {
     scene.getMeshByName(data.piece).position.x = data.position._x;
     scene.getMeshByName(data.piece).position.y = data.position._y;
     scene.getMeshByName(data.piece).position.z = data.position._z;
-    await setGameState(GameState);
+    setGameState(GameState);
     await setBoardDefault();
-    console.log(await checkMate(GameState));
+    turn = data.turn;
+    setNextToMove(turn);
+    if ((await checkMate(GameState)) !== false) {
+      socket.emit("checkmate", await checkMate(GameState));
+    }
   });
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-  camera.setTarget(ThreeDBoard[2][2][2]);
+  if (player === "Black") scene.activeCamera = camera1;
+  else scene.activeCamera = camera;
+  console.log(camera.position);
   return scene;
 };
 
@@ -261,11 +323,14 @@ const animateScene = async () => {
 
 const MainScreen = {
   after_render: async () => {
-    await animateScene();
+    const scene = await animateScene();
     const button = document.getElementById("MoveButton");
-    button.addEventListener("click", async () => {});
+    button.addEventListener("click", async () => {
+      console.log(scene.cameras[1].beta);
+    });
   },
-  render: () => {
+  render: async () => {
+    connect();
     return `<div>
     <canvas id="renderCanvas" touch-action="none"></canvas>
     <button id="MoveButton"> Move </button>

@@ -1541,7 +1541,7 @@ export const finalMoves = async (gameState, piece) => {
 export const checkMate = async (gameState) => {
   let isCheckMate = false;
   if ((await isCheck(gameState, gameState.bk)) === true) {
-    isCheckMate = "Black Checkmated";
+    isCheckMate = "White won by checkmate";
     for (const i in gameState) {
       if (
         gameState[i].color === "Black" &&
@@ -1552,7 +1552,7 @@ export const checkMate = async (gameState) => {
     }
   } else if ((await isCheck(gameState, gameState.wk)) === true) {
     console.log("geldim");
-    isCheckMate = "White Checkmated";
+    isCheckMate = "Black won by checkmate";
     for (const i in gameState) {
       if (
         gameState[i].color === "White" &&

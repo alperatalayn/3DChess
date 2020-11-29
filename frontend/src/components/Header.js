@@ -3,15 +3,15 @@ import { getUserInfo } from "../localStorage";
 const Header = {
   after_render: () => {},
   render: () => {
-    const { name } = getUserInfo();
+    const user = getUserInfo();
     return `
     <div class="brand">
         <a href="/#/">3DChess</a>
     </div>
     <div>
     ${
-      name
-        ? `<a href="/#/profile">${name}</a>`
+      user
+        ? `<a href="/#/profile">${user.name}</a>`
         : `<a href="/#/signin">Sign-In</a>`
     }
     </div>

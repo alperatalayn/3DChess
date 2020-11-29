@@ -23,7 +23,7 @@ const SigninScreen = {
       });
   },
   render: () => {
-    if (getUserInfo().name) {
+    if (getUserInfo()) {
       redirectUser();
     }
     return `

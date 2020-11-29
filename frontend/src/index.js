@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
+import HomeScreen from "./screens/HomeScreen";
 import MainScreen from "./screens/MainScreen";
 
 const routes = {
@@ -12,7 +13,8 @@ const routes = {
   "/register": RegisterScreen,
   "/profile": ProfileScreen,
   "/updateprofile": UpdateProfileScreen,
-  "/": MainScreen,
+  "/play": MainScreen,
+  "/": HomeScreen,
 };
 const router = async () => {
   showLoading();
