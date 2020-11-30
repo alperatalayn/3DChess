@@ -37,7 +37,7 @@ const RegisterScreen = {
       });
   },
   render: () => {
-    if (getUserInfo().name) {
+    if (getUserInfo()) {
       redirectUser();
     }
     return `
