@@ -32,10 +32,18 @@ socket.on("game started", async (data) => {
   console.log(getRoom());
   setGameState(initialState);
   GameState = getGameState();
-  await animateScene();
 });
+
+const gameEnded = (reason) => {
+  alert(`${reason}game ended`);
+  document.location.hash = "/#/";
+};
+
 socket.on("game ended", (data) => {
-  alert(`${data}game ended`);
+  gameEnded(data);
+});
+socket.on("checkmate", (data) => {
+  gameEnded(data);
 });
 const player = getColor();
 export const connect = () => {
@@ -323,11 +331,7 @@ const animateScene = async () => {
 
 const MainScreen = {
   after_render: async () => {
-    const scene = await animateScene();
-    const button = document.getElementById("MoveButton");
-    button.addEventListener("click", async () => {
-      console.log(scene.cameras[1].beta);
-    });
+    await animateScene();
   },
   render: async () => {
     connect();

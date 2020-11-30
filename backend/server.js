@@ -45,14 +45,12 @@ let user1;
 let user2;
 io.on("connection", (socket) => {
   socket.on("userconnected", (data) => {
-    const userDetails = data.user;
     const username = data.user.name;
     if (!activeSockets.hasOwnProperty(socket.id)) {
       activeSockets[socket.id] = { socket, username };
     }
     if (!activeUsers.hasOwnProperty(username)) {
       activeUsers[username] = {
-        userDetails,
         sockets: [socket.id],
       };
       console.log(data.user.name, "connected");
@@ -61,7 +59,6 @@ io.on("connection", (socket) => {
       activeUsers[username].sockets.push(socket);
       console.log(data.user.name, "started app at a new tab");
       if (data.room) {
-        console.log(data.room);
         socket.join(data.room);
       }
     }
@@ -69,7 +66,7 @@ io.on("connection", (socket) => {
       user1 = queue.shift();
       user2 = queue.shift();
       if (activeUsers.hasOwnProperty(user1)) {
-        activeUsers[user1].sockets.forEach((socketId) => {
+        activeUsers[user1].sockets.forEach(async (socketId) => {
           activeSockets[socketId].socket.join(user1);
           activeSockets[socketId].socket.emit("game started", {
             room: user1,
@@ -79,7 +76,7 @@ io.on("connection", (socket) => {
         });
       }
       if (activeUsers.hasOwnProperty(user2)) {
-        activeUsers[user2].sockets.forEach((socketId) => {
+        activeUsers[user2].sockets.forEach(async (socketId) => {
           activeSockets[socketId].socket.join(user1);
           activeSockets[socketId].socket.emit("game started", {
             room: user1,
@@ -97,7 +94,7 @@ io.on("connection", (socket) => {
     console.log(data);
   });
   socket.on("checkmate", async (data) => {
-    io.to(data.room).emit("game ended", data);
+    io.to(data.room).emit("checkmate", data);
     console.log(data);
   });
 
@@ -105,14 +102,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const socketId = socket.id;
     const { username } = activeSockets[socketId];
-    let userSocketList = activeUsers[username].sockets;
-    userSocketList.splice(userSocketList.indexOf(socketId), 1);
-    delete activeSockets[socketId];
-    console.log(username, "closed a tab");
-    if (userSocketList.length === 0) {
+    const userSocketList = activeUsers[username].sockets;
+    if (userSocketList.length === 1) {
+      console.log("evet");
       setTimeout(() => {
-        userSocketList = activeUsers[username].sockets;
-        if (userSocketList.length === 0) {
+        if (userSocketList.length === 1) {
           if (rooms.hasOwnProperty(username)) {
             io.to(username).emit("game ended", "Opponent disconnected");
             delete rooms[username];
@@ -126,10 +120,16 @@ io.on("connection", (socket) => {
               Object.keys(rooms).find((key) => rooms[key] === username)
             ];
           }
+
+          delete activeSockets[socketId];
           delete activeUsers[username];
           console.log(`${username}disconnected`);
         }
-      }, 15000);
+      }, 5000);
+    } else {
+      console.log(username, "closed a tab");
+      userSocketList.splice(userSocketList.indexOf(socketId), 1);
+      delete activeSockets[socketId];
     }
   });
 });
