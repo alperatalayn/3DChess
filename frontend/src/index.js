@@ -7,6 +7,8 @@ import ProfileScreen from "./screens/ProfileScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
 import HomeScreen from "./screens/HomeScreen";
 import MainScreen from "./screens/MainScreen";
+import { getUserInfo } from "./localStorage";
+import { connect } from "./api";
 
 const routes = {
   "/signin": SigninScreen,
@@ -35,3 +37,4 @@ const router = async () => {
 
 window.addEventListener("load", router);
 window.addEventListener("hashchange", router);
+if (getUserInfo()) connect();

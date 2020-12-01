@@ -2,7 +2,6 @@ export const setUserInfo = ({
   _id = "",
   name = "",
   email = "",
-  password = "",
   token = "",
   isAdmin = false,
 }) => {
@@ -12,7 +11,6 @@ export const setUserInfo = ({
       _id,
       name,
       email,
-      password,
       token,
       isAdmin,
     })
@@ -33,7 +31,6 @@ export const setGameState = (gamestate) => {
       gamestate,
     })
   );
-  console.log("setted");
 };
 export const setRoom = (room) => {
   localStorage.setItem("room", room);
@@ -61,4 +58,24 @@ export const getGameState = () => {
   if (localStorage.getItem("gameState"))
     return JSON.parse(localStorage.getItem("gameState")).gamestate;
   return null;
+};
+export const clearGame = async () => {
+  localStorage.removeItem("gameState");
+  localStorage.removeItem("next-to-move");
+  localStorage.removeItem("color");
+  localStorage.removeItem("room");
+  localStorage.removeItem("notation");
+};
+export const setNotation = (notation) => {
+  localStorage.setItem(
+    "notation",
+    JSON.stringify({
+      notation,
+    })
+  );
+};
+export const getNotation = () => {
+  if (localStorage.getItem("notation"))
+    return JSON.parse(localStorage.getItem("notation")).notation;
+  return [];
 };

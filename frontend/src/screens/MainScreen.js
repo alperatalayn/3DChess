@@ -4,72 +4,44 @@
 /* eslint-disable no-restricted-syntax */
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-import io from "socket.io-client";
-import { initialState } from "../config";
+import { sendMoveToServer, socket } from "../api";
 import {
   getGameState,
-  getUserInfo,
   setGameState,
-  setRoom,
   getRoom,
-  setColor,
   getColor,
   setNextToMove,
   getNextToMove,
+  clearGame,
+  getNotation,
+  setNotation,
 } from "../localStorage";
 import { checkMate, finalMoves, getPieceFromState } from "../moves";
 
-let turn = getNextToMove();
-let GameState = getGameState();
-const socket = io("http://localhost:5000");
+import { notation } from "../notation";
+
+let currentNotation;
+let turn;
+let GameState;
 const pi = 3.1415;
 let pieceToMove = null;
-socket.on("game started", async (data) => {
-  turn = "White";
-  setNextToMove(turn);
-  setRoom(data.room);
-  setColor(data.color);
-  console.log(getRoom());
-  setGameState(initialState);
-  GameState = getGameState();
-});
+let player;
 
 const gameEnded = (reason) => {
-  alert(`${reason}game ended`);
-  document.location.hash = "/#/";
+  alert(`${reason} game ended`);
+  clearGame();
+  document.location.hash = "/";
 };
 
 socket.on("game ended", (data) => {
   gameEnded(data);
 });
 socket.on("checkmate", (data) => {
-  gameEnded(data);
+  gameEnded(data.status);
 });
-const player = getColor();
-export const connect = () => {
-  const userInfo = getUserInfo();
-  io.connect({
-    reconnection: true,
-    reconnectionDelay: 500,
-    reconnectionAttempts: 10,
-  });
-  socket.emit("userconnected", { user: userInfo, room: getRoom() });
-};
-
-export const sendMoveToServer = async (roomToSend, movedPiece, pickInfo) => {
-  let nextToMove;
-  if (turn === "White") {
-    nextToMove = "Black";
-  } else {
-    nextToMove = "White";
-  }
-  socket.emit("sendMove", {
-    turn: nextToMove,
-    room: roomToSend,
-    piece: movedPiece,
-    position: pickInfo.pickedMesh.position,
-  });
-};
+socket.on("resign", (data) => {
+  gameEnded(`${data.color} resigned`);
+});
 
 const getMoves = async (pickInfo) => {
   const movesList = await finalMoves(
@@ -184,7 +156,7 @@ const createScene = async () => {
 
   const camera1 = new BABYLON.ArcRotateCamera(
     "cam",
-    pi / 2,
+    pi + pi / 2,
     2.8,
     15,
     ThreeDBoard[2][2][2],
@@ -264,6 +236,14 @@ const createScene = async () => {
   };
   scene.onPointerDown = async (evt, pickInfo) => {
     if (pickInfo.hit) {
+      console.log(
+        "x=",
+        pickInfo.pickedMesh.position.x,
+        " y=",
+        pickInfo.pickedMesh.position.y,
+        " z=",
+        pickInfo.pickedMesh.position.z / 2
+      );
       if (
         pickInfo.pickedMesh.type &&
         pieceToMove === null &&
@@ -279,7 +259,19 @@ const createScene = async () => {
         const movedPiece = pieceToMove.name;
         const roomToSend = getRoom();
         console.log(roomToSend);
-        await sendMoveToServer(roomToSend, movedPiece, pickInfo);
+        let moveType;
+        if (pickInfo.pickedMesh.status === "can-capture") {
+          moveType = "x";
+        } else {
+          moveType = "";
+        }
+        await sendMoveToServer(
+          turn,
+          roomToSend,
+          movedPiece,
+          pickInfo,
+          moveType
+        );
       } else {
         await setBoardDefault();
       }
@@ -306,9 +298,28 @@ const createScene = async () => {
     await setBoardDefault();
     turn = data.turn;
     setNextToMove(turn);
-    if ((await checkMate(GameState)) !== false) {
-      socket.emit("checkmate", await checkMate(GameState));
+    if ((await checkMate(GameState)) !== false && getColor() === "Black") {
+      socket.emit("checkmate", {
+        room: getRoom(),
+        status: await checkMate(GameState),
+      });
     }
+    currentNotation = notation(
+      currentNotation,
+      data.piece,
+      { x: data.position._x, y: data.position._y, z: data.position._z / 2 },
+      data.type
+    );
+    setNotation(currentNotation);
+    console.log(currentNotation);
+    document.getElementById("notation").innerHTML = currentNotation
+      .map(
+        (element) =>
+          `
+    <li>${element.movedPiece}${element.moveType}${element.text}</li>
+    `
+      )
+      .join("\n");
   });
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
   if (player === "Black") scene.activeCamera = camera1;
@@ -332,13 +343,34 @@ const animateScene = async () => {
 const MainScreen = {
   after_render: async () => {
     await animateScene();
+    document.getElementById("resignButton").addEventListener("click", () => {
+      socket.emit("resign", {
+        color: getColor(),
+        room: getRoom(),
+      });
+    });
   },
   render: async () => {
-    connect();
-    return `<div>
+    GameState = getGameState();
+    turn = getNextToMove();
+    player = getColor();
+    currentNotation = getNotation();
+    return `<div id ="main-container">
     <canvas id="renderCanvas" touch-action="none"></canvas>
-    <button id="MoveButton"> Move </button>
-    </div>`;
+    <button id="resignButton"> Resign </button>
+    </div>
+    <div id="notation">
+      ${currentNotation
+        .map(
+          (element) =>
+            `
+        <li>${element.movedPiece},${element.text},${element.moveType}</li>
+        `
+        )
+        .join("\n")}
+    </div>
+    `;
   },
 };
+
 export default MainScreen;

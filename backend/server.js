@@ -32,7 +32,6 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http, {
   cors: {
     origin: "http://localhost:8080",
-    methods: ["GET", "POST"],
   },
 });
 
@@ -44,24 +43,26 @@ const rooms = {};
 let user1;
 let user2;
 io.on("connection", (socket) => {
-  socket.on("userconnected", (data) => {
+  socket.on("new user joined", (data) => {
     const username = data.user.name;
     if (!activeSockets.hasOwnProperty(socket.id)) {
-      activeSockets[socket.id] = { socket, username };
+      activeSockets[socket.id] = { socket, user: username };
     }
     if (!activeUsers.hasOwnProperty(username)) {
       activeUsers[username] = {
         sockets: [socket.id],
       };
       console.log(data.user.name, "connected");
-      queue.push(username);
     } else {
-      activeUsers[username].sockets.push(socket);
+      activeUsers[username].sockets.push(socket.id);
       console.log(data.user.name, "started app at a new tab");
       if (data.room) {
         socket.join(data.room);
       }
     }
+  });
+  socket.on("search game", (username) => {
+    queue.push(username);
     if (queue.length >= 2) {
       user1 = queue.shift();
       user2 = queue.shift();
@@ -87,6 +88,8 @@ io.on("connection", (socket) => {
       }
       console.log("joined room", user1);
       rooms[user1] = user2;
+    } else {
+      socket.emit("waiting for opponent");
     }
   });
   socket.on("sendMove", async (data) => {
@@ -95,41 +98,53 @@ io.on("connection", (socket) => {
   });
   socket.on("checkmate", async (data) => {
     io.to(data.room).emit("checkmate", data);
+    delete rooms[data.room];
+    console.log(data);
+  });
+  socket.on("resign", async (data) => {
+    io.to(data.room).emit("resign", data);
+
+    delete rooms[data.room];
     console.log(data);
   });
 
   // Whenever someone disconnects this piece of code executed
   socket.on("disconnect", () => {
-    const socketId = socket.id;
-    const { username } = activeSockets[socketId];
-    const userSocketList = activeUsers[username].sockets;
-    if (userSocketList.length === 1) {
-      console.log("evet");
-      setTimeout(() => {
-        if (userSocketList.length === 1) {
-          if (rooms.hasOwnProperty(username)) {
-            io.to(username).emit("game ended", "Opponent disconnected");
-            delete rooms[username];
-          }
-
-          if (Object.values(rooms).indexOf(username) > -1) {
-            io.to(
-              Object.keys(rooms).find((key) => rooms[key] === username)
-            ).emit("game ended", "Opponent disconnected");
-            delete rooms[
-              Object.keys(rooms).find((key) => rooms[key] === username)
-            ];
-          }
-
-          delete activeSockets[socketId];
-          delete activeUsers[username];
-          console.log(`${username}disconnected`);
-        }
-      }, 5000);
-    } else {
-      console.log(username, "closed a tab");
+    try {
+      const socketId = socket.id;
+      console.log("geldim");
+      const username = activeSockets[socketId].user;
+      const userSocketList = activeUsers[username].sockets;
       userSocketList.splice(userSocketList.indexOf(socketId), 1);
       delete activeSockets[socketId];
+      console.log(username, "closed a tab");
+      if (userSocketList.length === 0) {
+        console.log("evet");
+        setTimeout(() => {
+          if (
+            userSocketList.length === 0 &&
+            activeUsers.hasOwnProperty(username)
+          ) {
+            if (rooms.hasOwnProperty(username)) {
+              io.to(username).emit("game ended", "Opponent disconnected");
+              delete rooms[username];
+            }
+
+            if (Object.values(rooms).indexOf(username) > -1) {
+              io.to(
+                Object.keys(rooms).find((key) => rooms[key] === username)
+              ).emit("game ended", "Opponent disconnected");
+              delete rooms[
+                Object.keys(rooms).find((key) => rooms[key] === username)
+              ];
+            }
+            delete activeUsers[username];
+            console.log(`${username}disconnected`);
+          }
+        }, 15000);
+      }
+    } catch (error) {
+      console.log("unexpected disconnection why do you leave us + bişey oldu");
     }
   });
 });

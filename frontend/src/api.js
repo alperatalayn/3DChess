@@ -1,7 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import axios from "axios";
+import io from "socket.io-client";
 import { apiUrl } from "./config";
-import { getUserInfo } from "./localStorage";
+import { getRoom, getUserInfo } from "./localStorage";
+
+export const socket = io("http://localhost:5000");
 
 export const getUserById = async (id) => {
   try {
@@ -92,4 +95,27 @@ export const updateUser = async ({ name, email, password }) => {
     return { error: err.response.data.message || err.message };
   }
 };
-export const pushMove = () => {};
+export const connect = () => {
+  socket.emit("new user joined", { user: getUserInfo(), room: getRoom() });
+};
+export const sendMoveToServer = async (
+  turn,
+  roomToSend,
+  movedPiece,
+  pickInfo,
+  moveType
+) => {
+  let nextToMove;
+  if (turn === "White") {
+    nextToMove = "Black";
+  } else {
+    nextToMove = "White";
+  }
+  socket.emit("sendMove", {
+    turn: nextToMove,
+    room: roomToSend,
+    piece: movedPiece,
+    position: pickInfo.pickedMesh.position,
+    type: moveType,
+  });
+};
