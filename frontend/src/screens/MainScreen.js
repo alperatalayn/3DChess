@@ -157,7 +157,7 @@ const createScene = async () => {
   const camera1 = new BABYLON.ArcRotateCamera(
     "cam",
     pi + pi / 2,
-    2.8,
+    2.8 - pi,
     15,
     ThreeDBoard[2][2][2],
     scene,
@@ -316,7 +316,9 @@ const createScene = async () => {
       .map(
         (element) =>
           `
-    <li>${element.movedPiece}${element.moveType}${element.text}</li>
+    <li>${element.movedPiece}${
+            element.moveType === "x" ? `<i class="fa fa-thermometer"></i>` : ``
+          }${element.text}</li>
     `
       )
       .join("\n");
@@ -364,7 +366,7 @@ const MainScreen = {
         .map(
           (element) =>
             `
-        <li>${element.movedPiece},${element.text},${element.moveType}</li>
+        <li>${element.movedPiece}${element.text}${element.moveType}</li>
         `
         )
         .join("\n")}
