@@ -155,9 +155,20 @@ footer {
 }
 #renderCanvas {
   outline: none;
-  width: 831px;
-  height: 831px;
+  height: 800px;
+  width: 30%;
 }
-#renderCanvas.active {
-  border: none;
+.notation ul {
+  padding: 1rem;
+}
+.notation ul li {
+  list-style: none;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  border-bottom: 5px solid #40f040;
+}
+.two-d-boards {
+  background-color: #40f040;
+  margin: auto;
+  align-items: center;
 }

@@ -312,17 +312,17 @@ const createScene = async () => {
     );
     setNotation(currentNotation);
     console.log(currentNotation);
-    document.getElementById("notation").innerHTML = currentNotation
-      .map(
-        (element) =>
-          `
-    <li>${element.movedPiece}${
-            element.moveType === "x" ? `<i class="fa fa-thermometer"></i>` : ``
-          }${element.text}</li>
-    `
-      )
-      .join("\n");
+    document.getElementById("notation").innerHTML = `<ul>${currentNotation
+      .map((element) => {
+        return `
+          <li>${element.movedPiece}${element.moveType === "x" ? ` x ` : ``}${
+          element.text
+        }</li>
+          `;
+      })
+      .join("\n")}</ul>`;
   });
+
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
   if (player === "Black") scene.activeCamera = camera1;
   else scene.activeCamera = camera;
@@ -357,20 +357,23 @@ const MainScreen = {
     turn = getNextToMove();
     player = getColor();
     currentNotation = getNotation();
-    return `<div id ="main-container">
-    <canvas id="renderCanvas" touch-action="none"></canvas>
-    <button id="resignButton"> Resign </button>
+    return `<div class ="row">
+    <canvas id="renderCanvas" touch-action="none" class="col-md-4"></canvas>
+    <div class="two-d-boards col-md-5"><img src="/images/twodboard.png"/></div>
+    <div class="col-md-3">
+      <div id="notation" class="notation"><ul>${currentNotation
+        .map((element) => {
+          return `
+            <li>${element.movedPiece}${element.moveType === "x" ? ` x ` : ``}${
+            element.text
+          }</li>
+            `;
+        })
+        .join("\n")}</ul></div>
+      <button id="resignButton"> Resign </button>
     </div>
-    <div id="notation">
-      ${currentNotation
-        .map(
-          (element) =>
-            `
-        <li>${element.movedPiece}${element.text}${element.moveType}</li>
-        `
-        )
-        .join("\n")}
     </div>
+    
     `;
   },
 };
