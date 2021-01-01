@@ -1,3 +1,5 @@
+import { indexToSquare } from "./config";
+
 const zAxis = {
   0: "A",
   1: "B",
@@ -19,11 +21,33 @@ const xAxis = {
   3: "b",
   4: "a",
 };
-export const notation = (notationInput = [], piece, coordinates, type) => {
-  const move = { movedPiece: piece, text: "", moveType: type };
-  move.text =
-    zAxis[coordinates.z] + xAxis[coordinates.x] + yAxis[coordinates.y];
+const pieceNames = {
+  1: "P",
+  2: "N",
+  3: "B",
+  4: "R",
+  5: "U",
+  6: "Q",
+  7: "K",
+};
+
+export const notation = (notationInput = [], piece, move) => {
+  let moveToAdd = "";
+  if (move.type === "Capture") {
+    moveToAdd = `${pieceNames[Math.abs(piece)]} x${
+      zAxis[indexToSquare(move.to).level]
+    }${xAxis[indexToSquare(move.to).file]}${
+      yAxis[indexToSquare(move.to).rank]
+    }`;
+  } else {
+    moveToAdd = `${pieceNames[Math.abs(piece)]} ${
+      zAxis[indexToSquare(move.to).level]
+    }${xAxis[indexToSquare(move.to).file]}${
+      yAxis[indexToSquare(move.to).rank]
+    }`;
+  }
+
   const notationList = notationInput;
-  notationList.push(move);
+  notationList.push(moveToAdd);
   return notationList;
 };

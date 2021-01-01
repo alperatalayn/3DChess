@@ -40,18 +40,19 @@ export const getRoom = () => {
   return null;
 };
 export const setColor = (color) => {
-  localStorage.setItem("color", color);
+  localStorage.setItem("color", JSON.stringify(color));
 };
 export const getColor = () => {
-  if (localStorage.getItem("color")) return localStorage.getItem("color");
+  if (localStorage.getItem("color"))
+    return JSON.parse(localStorage.getItem("color"));
   return null;
 };
 export const setNextToMove = (nextToMove) => {
-  localStorage.setItem("next-to-move", nextToMove);
+  localStorage.setItem("next-to-move", JSON.stringify(nextToMove));
 };
 export const getNextToMove = () => {
   if (localStorage.getItem("next-to-move"))
-    return localStorage.getItem("next-to-move");
+    return JSON.parse(localStorage.getItem("next-to-move"));
   return null;
 };
 export const getGameState = () => {
@@ -78,4 +79,15 @@ export const getNotation = () => {
   if (localStorage.getItem("notation"))
     return JSON.parse(localStorage.getItem("notation")).notation;
   return [];
+};
+export const setOpponent = (opponent) => {
+  localStorage.setItem(
+    "opponent",
+    JSON.stringify({
+      opponent,
+    })
+  );
+};
+export const getOpponent = () => {
+  return JSON.parse(localStorage.getItem("opponent")).opponent;
 };

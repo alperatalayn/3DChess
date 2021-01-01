@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import { clearInterval } from "timers";
 import userRouter from "./routers/userRouter";
 import config from "./config";
 
@@ -32,14 +33,21 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http, {
   cors: {
     origin: "http://localhost:8080",
+    transports: ["websocket"],
   },
 });
 
-// Whenever someone connects this gets executed
+class Game {
+  constructor(user1, user2, timeVariant = 300) {
+    this.user1 = { name: user1, timeRemaining: timeVariant };
+    this.user2 = { name: user2, timeRemaining: timeVariant };
+    this.interval = null;
+  }
+}
 const activeUsers = {};
 const activeSockets = {};
 const queue = [];
-const rooms = {};
+const games = {};
 let user1;
 let user2;
 io.on("connection", (socket) => {
@@ -68,46 +76,69 @@ io.on("connection", (socket) => {
       user2 = queue.shift();
       if (activeUsers.hasOwnProperty(user1)) {
         activeUsers[user1].sockets.forEach(async (socketId) => {
-          activeSockets[socketId].socket.join(user1);
+          activeSockets[socketId].socket.join(`${user1}-${user2}`);
           activeSockets[socketId].socket.emit("game started", {
-            room: user1,
-            color: "White",
+            room: `${user1}-${user2}`,
+            color: 1,
+            opponent: user2,
           });
           console.log(socketId);
         });
       }
       if (activeUsers.hasOwnProperty(user2)) {
         activeUsers[user2].sockets.forEach(async (socketId) => {
-          activeSockets[socketId].socket.join(user1);
+          activeSockets[socketId].socket.join(`${user1}-${user2}`);
           activeSockets[socketId].socket.emit("game started", {
-            room: user1,
-            color: "Black",
+            room: `${user1}-${user2}`,
+            color: -1,
+            opponent: user1,
           });
           console.log(socketId);
         });
       }
-      console.log("joined room", user1);
-      rooms[user1] = user2;
+      console.log("joined room", `${user1}-${user2}`);
+      games[`${user1}-${user2}`] = new Game(user1, user2);
     } else {
       socket.emit("waiting for opponent");
     }
   });
-  socket.on("sendMove", async (data) => {
-    io.to(data.room).emit("getMove", data);
-    console.log(data);
+  socket.on("sendMove", (data) => {
+    if (data.turn === 1) {
+      clearInterval(games[data.room].interval);
+      games[data.room].interval = setInterval(() => {
+        if (games[data.room].user2.timeRemaining <= 0) {
+          io.to(data.room).emit("timeout", "time out white won!");
+        }
+        games[data.room].user2.timeRemaining -= 1;
+        io.to(data.room).emit("timeupdate", {
+          white: games[data.room].user1.timeRemaining,
+          black: games[data.room].user2.timeRemaining,
+        });
+      }, 1000);
+    } else {
+      clearInterval(games[data.room].interval);
+      games[data.room].interval = setInterval(() => {
+        if (games[data.room].user1.timeRemaining <= 0) {
+          io.to(data.room).emit("timeout", "time out black won!");
+        }
+        games[data.room].user1.timeRemaining -= 1;
+        io.to(data.room).emit("timeupdate", {
+          white: games[data.room].user1.timeRemaining,
+          black: games[data.room].user2.timeRemaining,
+        });
+      }, 1000);
+    }
+    socket.to(data.room).emit("getMove", data);
   });
-  socket.on("checkmate", async (data) => {
+  socket.on("checkmate", (data) => {
     io.to(data.room).emit("checkmate", data);
-    delete rooms[data.room];
-    console.log(data);
   });
-  socket.on("resign", async (data) => {
+  socket.on("resign", (data) => {
     io.to(data.room).emit("resign", data);
-
-    delete rooms[data.room];
-    console.log(data);
   });
-
+  socket.on("finish", (data) => {
+    socket.leave(data.room);
+  });
   // Whenever someone disconnects this piece of code executed
   socket.on("disconnect", () => {
     try {
@@ -125,19 +156,6 @@ io.on("connection", (socket) => {
             userSocketList.length === 0 &&
             activeUsers.hasOwnProperty(username)
           ) {
-            if (rooms.hasOwnProperty(username)) {
-              io.to(username).emit("game ended", "Opponent disconnected");
-              delete rooms[username];
-            }
-
-            if (Object.values(rooms).indexOf(username) > -1) {
-              io.to(
-                Object.keys(rooms).find((key) => rooms[key] === username)
-              ).emit("game ended", "Opponent disconnected");
-              delete rooms[
-                Object.keys(rooms).find((key) => rooms[key] === username)
-              ];
-            }
             delete activeUsers[username];
             console.log(`${username}disconnected`);
           }

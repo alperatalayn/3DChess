@@ -82,7 +82,7 @@ button.primary {
     "footer";
   grid-template-columns: 1fr;
   grid-template-rows: 5rem 1fr 5rem;
-  height: 100%;
+  height: 100vh;
 }
 header {
   grid-area: header;
@@ -155,8 +155,8 @@ footer {
 }
 #renderCanvas {
   outline: none;
-  height: 800px;
-  width: 30%;
+  height: 810px;
+  width: 100%;
 }
 .notation ul {
   padding: 1rem;
@@ -168,7 +168,66 @@ footer {
   border-bottom: 5px solid #40f040;
 }
 .two-d-boards {
-  background-color: #40f040;
-  margin: auto;
+  height: 100%;
+  display: block;
+}
+.two-d-boards table {
+  display: inline-block;
+  width: 40%;
+  height: 40%;
+}
+.two-d-boards table tbody {
+  display: block;
+  height: inherit;
+  padding-top: 1rem;
+  padding-right: 1rem;
+}
+.two-d-boards table tbody tr {
+  display: block;
+  height: inherit;
+}
+.two-d-boards table tbody tr td {
+  display: inline-block;
+  position: relative;
+  width: 20%;
+  padding-bottom: 20%;
+}
+.two-d-boards table tbody tr td img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.dark {
+  background-color: rgb(167, 110, 69);
+}
+.light {
+  background-color: rgb(228, 228, 135);
+}
+.move-dest-dark {
+  background: -webkit-radial-gradient(
+    center,
+    rgb(43, 53, 37) 20%,
+    rgb(167, 110, 69) 10%,
+    rgb(167, 110, 69)
+  );
+}
+.move-dest-light {
+  background: -webkit-radial-gradient(
+    center,
+    rgb(41, 58, 41) 20%,
+    rgb(228, 228, 135) 10%,
+    rgb(228, 228, 135)
+  );
+}
+.move-dest-kill {
+  background: red;
+}
+.selected {
+  width: 80% !important;
+  height: 80% !important;
+  display: block !important;
+}
+#side-table {
   align-items: center;
+  padding-top: 5rem;
 }

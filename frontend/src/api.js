@@ -1,11 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 import axios from "axios";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import { apiUrl } from "./config";
 import { getRoom, getUserInfo } from "./localStorage";
 
-export const socket = io("http://localhost:5000");
-
+export const socket = io("http://localhost:5000", {
+  transports: ["websocket"],
+  upgrade: false,
+});
 export const getUserById = async (id) => {
   try {
     const response = await axios({
@@ -98,24 +100,6 @@ export const updateUser = async ({ name, email, password }) => {
 export const connect = () => {
   socket.emit("new user joined", { user: getUserInfo(), room: getRoom() });
 };
-export const sendMoveToServer = async (
-  turn,
-  roomToSend,
-  movedPiece,
-  pickInfo,
-  moveType
-) => {
-  let nextToMove;
-  if (turn === "White") {
-    nextToMove = "Black";
-  } else {
-    nextToMove = "White";
-  }
-  socket.emit("sendMove", {
-    turn: nextToMove,
-    room: roomToSend,
-    piece: movedPiece,
-    position: pickInfo.pickedMesh.position,
-    type: moveType,
-  });
+export const sendMoveToServer = async (move, room, turn) => {
+  socket.emit("sendMove", { room, move, turn });
 };

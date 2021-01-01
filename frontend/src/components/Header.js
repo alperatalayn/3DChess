@@ -1,8 +1,8 @@
 import { getUserInfo } from "../localStorage";
 
 const Header = {
-  after_render: () => {},
-  render: () => {
+  after_render: async () => {},
+  render: async () => {
     const user = getUserInfo();
     return `
     <div class="brand">

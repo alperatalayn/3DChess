@@ -1,11 +1,12 @@
 import { socket } from "../api";
-import { initialState } from "../config";
+import { startingPosBoard } from "../config";
 import {
   clearGame,
   getUserInfo,
   setColor,
   setGameState,
   setNextToMove,
+  setOpponent,
   setRoom,
 } from "../localStorage";
 import { hideLoading, showLoading } from "../utils";
@@ -17,10 +18,11 @@ const MainScreen = {
     });
     socket.on("game started", async (data) => {
       await clearGame();
-      setNextToMove("White");
+      setNextToMove(1);
       setRoom(data.room);
+      setOpponent(data.opponent);
       setColor(data.color);
-      setGameState(initialState);
+      setGameState(startingPosBoard());
       hideLoading();
       document.location.hash = "/play";
     });

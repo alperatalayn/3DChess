@@ -6,17 +6,17 @@ import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
 import HomeScreen from "./screens/HomeScreen";
-import MainScreen from "./screens/MainScreen";
-import { getUserInfo } from "./localStorage";
+import TestScreen from "./screens/Test";
 import { connect } from "./api";
 
+connect();
 const routes = {
   "/signin": SigninScreen,
   "/register": RegisterScreen,
   "/profile": ProfileScreen,
   "/updateprofile": UpdateProfileScreen,
-  "/play": MainScreen,
   "/": HomeScreen,
+  "/play": TestScreen,
 };
 const router = async () => {
   showLoading();
@@ -37,4 +37,3 @@ const router = async () => {
 
 window.addEventListener("load", router);
 window.addEventListener("hashchange", router);
-if (getUserInfo()) connect();

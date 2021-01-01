@@ -1,52 +1,80 @@
 export const apiUrl = "http://localhost:5000";
-class Piece {
-  constructor(type, { x, y, z }, obj, color) {
-    this.obj = obj;
-    this.coordinates = { x, y, z };
-    this.type = type;
-    this.color = color;
+const BOARD_SIZE = 5;
+export const FILE = { e: 0, d: 1, c: 2, b: 3, a: 4 };
+export const RANK = { one: 0, two: 1, three: 2, four: 3, five: 4 };
+export const LEVEL = { A: 0, B: 1, C: 2, D: 3, E: 4 };
+export const pieces = Object.freeze({
+  EMPTY: 0,
+  WP: 1,
+  WN: 2,
+  WB: 3,
+  WR: 4,
+  WU: 5,
+  WQ: 6,
+  WK: 7,
+  BP: -1,
+  BN: -2,
+  BB: -3,
+  BR: -4,
+  BU: -5,
+  BQ: -6,
+  BK: -7,
+});
+export const squareToIndex = (file, rank, level) => {
+  return level * BOARD_SIZE * BOARD_SIZE + rank * BOARD_SIZE + file;
+};
+export const indexToSquare = (index) => {
+  let Level = index / (BOARD_SIZE * BOARD_SIZE);
+  Level = Math.floor(Level);
+  let Rank = (index - Level * BOARD_SIZE * BOARD_SIZE) / BOARD_SIZE;
+  Rank = Math.floor(Rank);
+  let File = index - Level * BOARD_SIZE * BOARD_SIZE - Rank * BOARD_SIZE;
+  File = Math.floor(File);
+  return {
+    file: File,
+    rank: Rank,
+    level: Level,
+  };
+};
+export const startingPosBoard = () => {
+  const board = new Int8Array(125);
+  for (let i = FILE.e; i <= FILE.a; i += 1) {
+    board[squareToIndex(i, RANK.two, LEVEL.A)] = pieces.WP;
+    board[squareToIndex(i, RANK.two, LEVEL.B)] = pieces.WP;
   }
-}
-export const initialState = {
-  p1: new Piece("WhitePawn", { x: 0, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p2: new Piece("WhitePawn", { x: 1, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p3: new Piece("WhitePawn", { x: 2, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p4: new Piece("WhitePawn", { x: 3, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p5: new Piece("WhitePawn", { x: 4, y: 1, z: 0 }, "ChessPawn.obj", "White"),
-  p6: new Piece("WhitePawn", { x: 0, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p7: new Piece("WhitePawn", { x: 1, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p8: new Piece("WhitePawn", { x: 2, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p9: new Piece("WhitePawn", { x: 3, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  p10: new Piece("WhitePawn", { x: 4, y: 1, z: 1 }, "ChessPawn.obj", "White"),
-  wr1: new Piece("Rook", { x: 0, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  wn1: new Piece("Knight", { x: 1, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  wk: new Piece("King", { x: 2, y: 0, z: 0 }, "ChessKing.obj", "White"),
-  wn2: new Piece("Knight", { x: 3, y: 0, z: 0 }, "ChessKnight.obj", "White"),
-  wr2: new Piece("Rook", { x: 4, y: 0, z: 0 }, "ChessRook.obj", "White"),
-  wb1: new Piece("Bishop", { x: 0, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  wu1: new Piece("Unicorn", { x: 1, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
-  wq: new Piece("Queen", { x: 2, y: 0, z: 1 }, "ChessQueen.obj", "White"),
-  wb2: new Piece("Bishop", { x: 3, y: 0, z: 1 }, "ChessBishop.obj", "White"),
-  wu2: new Piece("Unicorn", { x: 4, y: 0, z: 1 }, "ChessUnicorn.obj", "White"),
+  for (let i = FILE.e; i <= FILE.a; i += 1) {
+    board[squareToIndex(i, RANK.four, LEVEL.E)] = pieces.BP;
+    board[squareToIndex(i, RANK.four, LEVEL.D)] = pieces.BP;
+  }
 
-  bp1: new Piece("BlackPawn", { x: 0, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp2: new Piece("BlackPawn", { x: 1, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp3: new Piece("BlackPawn", { x: 2, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp4: new Piece("BlackPawn", { x: 3, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp5: new Piece("BlackPawn", { x: 4, y: 3, z: 4 }, "ChessPawn.obj", "Black"),
-  bp6: new Piece("BlackPawn", { x: 0, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp7: new Piece("BlackPawn", { x: 1, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp8: new Piece("BlackPawn", { x: 2, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp9: new Piece("BlackPawn", { x: 3, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  bp10: new Piece("BlackPawn", { x: 4, y: 3, z: 3 }, "ChessPawn.obj", "Black"),
-  br1: new Piece("Rook", { x: 0, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  bn1: new Piece("Knight", { x: 1, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  bk: new Piece("King", { x: 2, y: 4, z: 4 }, "ChessKing.obj", "Black"),
-  bn2: new Piece("Knight", { x: 3, y: 4, z: 4 }, "ChessKnight.obj", "Black"),
-  br2: new Piece("Rook", { x: 4, y: 4, z: 4 }, "ChessRook.obj", "Black"),
-  bb1: new Piece("Bishop", { x: 1, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  bu1: new Piece("Unicorn", { x: 0, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
-  bq: new Piece("Queen", { x: 2, y: 4, z: 3 }, "ChessQueen.obj", "Black"),
-  bb2: new Piece("Bishop", { x: 4, y: 4, z: 3 }, "ChessBishop.obj", "Black"),
-  bu2: new Piece("Unicorn", { x: 3, y: 4, z: 3 }, "ChessUnicorn.obj", "Black"),
+  board[squareToIndex(FILE.a, RANK.one, LEVEL.B)] = pieces.WB;
+  board[squareToIndex(FILE.d, RANK.one, LEVEL.B)] = pieces.WB;
+
+  board[squareToIndex(FILE.b, RANK.one, LEVEL.B)] = pieces.WU;
+  board[squareToIndex(FILE.e, RANK.one, LEVEL.B)] = pieces.WU;
+
+  board[squareToIndex(FILE.a, RANK.one, LEVEL.A)] = pieces.WR;
+  board[squareToIndex(FILE.e, RANK.one, LEVEL.A)] = pieces.WR;
+
+  board[squareToIndex(FILE.b, RANK.one, LEVEL.A)] = pieces.WN;
+  board[squareToIndex(FILE.d, RANK.one, LEVEL.A)] = pieces.WN;
+
+  board[squareToIndex(FILE.c, RANK.one, LEVEL.A)] = pieces.WK;
+  board[squareToIndex(FILE.c, RANK.one, LEVEL.B)] = pieces.WQ;
+
+  board[squareToIndex(FILE.a, RANK.five, LEVEL.D)] = pieces.BB;
+  board[squareToIndex(FILE.d, RANK.five, LEVEL.D)] = pieces.BB;
+
+  board[squareToIndex(FILE.b, RANK.five, LEVEL.D)] = pieces.BU;
+  board[squareToIndex(FILE.e, RANK.five, LEVEL.D)] = pieces.BU;
+
+  board[squareToIndex(FILE.a, RANK.five, LEVEL.E)] = pieces.BR;
+  board[squareToIndex(FILE.e, RANK.five, LEVEL.E)] = pieces.BR;
+
+  board[squareToIndex(FILE.b, RANK.five, LEVEL.E)] = pieces.BN;
+  board[squareToIndex(FILE.d, RANK.five, LEVEL.E)] = pieces.BN;
+
+  board[squareToIndex(FILE.c, RANK.five, LEVEL.E)] = pieces.BK;
+  board[squareToIndex(FILE.c, RANK.five, LEVEL.D)] = pieces.BQ;
+  return board;
 };
