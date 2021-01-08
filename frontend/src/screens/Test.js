@@ -34,11 +34,17 @@ let room;
 let makeMove;
 const gameEnded = (reason) => {
   alert(`${reason} game ended`);
-  clearGame();
   document.location.hash = "/";
+  clearGame();
 };
 socket.on("timeupdate", (data) => {
   console.log(data);
+});
+socket.on("timeout", (data) => {
+  socket.emit("finish", {
+    room: getRoom(),
+  });
+  gameEnded(data);
 });
 socket.on("game ended", (data) => {
   gameEnded(data);

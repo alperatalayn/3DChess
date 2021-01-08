@@ -98,7 +98,7 @@ export const updateUser = async ({ name, email, password }) => {
   }
 };
 export const connect = () => {
-  socket.emit("new user joined", { user: getUserInfo(), room: getRoom() });
+  socket.emit("new user joined", { user: getUserInfo() ? getUserInfo() : "", room: getRoom() });
 };
 export const sendMoveToServer = async (move, room, turn) => {
   socket.emit("sendMove", { room, move, turn });

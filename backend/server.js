@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { clearInterval } from "timers";
 import userRouter from "./routers/userRouter";
 import config from "./config";
+import { type } from "os";
 
 mongoose
   .connect(config.MONGODB_URL, {
@@ -137,6 +138,11 @@ io.on("connection", (socket) => {
     io.to(data.room).emit("resign", data);
   });
   socket.on("finish", (data) => {
+    if(games.hasOwnProperty(data.room)){
+      clearInterval(games[data.room].interval)
+      delete games[data.room];
+    }
+    console.log(games)
     socket.leave(data.room);
   });
   // Whenever someone disconnects this piece of code executed
